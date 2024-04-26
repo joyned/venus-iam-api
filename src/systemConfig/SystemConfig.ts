@@ -26,6 +26,10 @@ export class SystemConfig {
     private systemRepository: Repository<System> = AppDataSource.getRepository(System);
     private readonly systemVersion: string = '1.0.0';
 
+    async getSystemInfo() {
+        return await this.systemRepository.findOneBy({ id: 1 });
+    }
+
     async start() {
         try {
             if (! await this.alreadyConfigured()) {
