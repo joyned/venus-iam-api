@@ -12,6 +12,13 @@ userController.get('/:id', async (req, res) => {
     return res.json(await service.findById(req.params.id));
 });
 
+userController.post('/', async (req, res) => {
+    return res.json(await service.persist(req.body))
+});
+
+userController.delete('/:id', async (req, res) => {
+    return res.json(await service.delete(req.params.id))
+});
 
 
 export default userController;
