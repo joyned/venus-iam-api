@@ -13,9 +13,7 @@ export class Client {
     @Column()
     url?: string;
 
-    @OneToMany(() => ClientAllowedUrl,
-        (clientAllowedUrl) => clientAllowedUrl.client, { eager: true }
-    )
+    @OneToMany(() => ClientAllowedUrl, (clientAllowedUrl) => clientAllowedUrl.client, { eager: true })
     allowedUrls?: ClientAllowedUrl[]
 
     @Column({ name: "client_id" })
