@@ -6,7 +6,7 @@ const FIND = `SELECT id, "name", email, "password", created_at, is_blocked FROM 
 const INSERT =
   'INSERT INTO venus."user" (id, "name", email, "password", created_at, is_blocked) VALUES($1, $2, $3, $4, CURRENT_TIMESTAMP, false);';
 const UPDATE =
-  'UPDATE venus."user" SET "name"=$2, email=$3, "password"=$4, is_blocked=$5 WHERE id=$1';
+  'UPDATE venus."user" SET "name"=$2, email=$3, is_blocked=$4 WHERE id=$1';
 const DELETE = `DELETE FROM venus."user" WHERE id=$1`;
 
 export class UserRepository {
@@ -44,8 +44,7 @@ export class UserRepository {
         user.id,
         user.name,
         user.email,
-        user.password,
-        user.isBlocked,
+        user.isBlocked || false,
       ]);
     }
 
