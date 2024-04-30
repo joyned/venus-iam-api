@@ -1,12 +1,8 @@
-import { Repository } from "typeorm";
 import { v4 } from "uuid";
-import { AppDataSource } from "../database";
 import { Group } from "../entities/Group";
 import { Role } from "../entities/Role";
 import { System } from "../entities/System";
 import { loggerFactory } from "../logger";
-import { GroupRepository } from "../repositories/GroupRepository";
-import { RoleRepository } from "../repositories/RoleRepository";
 import { SystemConstants } from "./SystemConstants";
 
 class SystemCreatedRole {
@@ -22,12 +18,10 @@ class SystemCreatedRole {
 export class SystemConfig {
 
     private readonly logger = loggerFactory(__filename);
-
-    private systemRepository: Repository<System> = AppDataSource.getRepository(System);
     private readonly systemVersion: string = '1.0.0';
 
     async getSystemInfo() {
-        return await this.systemRepository.findOneBy({ id: 1 });
+        return System.findOne({ where: { id: 1 } })
     }
 
     async start() {
@@ -57,7 +51,8 @@ export class SystemConfig {
         systemViewerRole.name = SystemConstants.systemViewerRoleName;
         systemViewerRole.createdAt = new Date();
 
-        await RoleRepository.save([systemAdministratorRole, systemViewerRole]);
+        await systemAdministratorRole.save()
+        await systemViewerRole.save()
 
         return {
             systemAdministratorRole: systemAdministratorRole,
@@ -81,21 +76,22 @@ export class SystemConfig {
         systemViewerGroup.createdAt = new Date();
         systemViewerGroup.lastUpdate = new Date();
 
-        await GroupRepository.save([systemAdministratorGroup, systemViewerGroup]);
+        await systemAdministratorGroup.save();
+        await systemViewerGroup.save();
     }
 
     private async createSystemConfigs() {
         const system = new System();
-        system.id = 1
-        system.version = this.systemVersion;
+        system.set('id', 1);
+        system.set('version', this.systemVersion)
 
-        await this.systemRepository.save(system);
+        await system.save();
     }
 
     private async alreadyConfigured(): Promise<boolean> {
-        const system = await this.systemRepository.findOneBy({ id: 1 });
+        const system = await System.findOne({ where: { id: 1 } });
         if (system) {
-            this.logger.info(`System configured. Version ${system.version}`);
+            this.logger.info(`System configured. Version ${system.get('version')}`);
             return true;
         }
         return false;

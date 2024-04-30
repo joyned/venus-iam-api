@@ -1,17 +1,21 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Model, STRING } from "sequelize";
+import { sequelize } from "../database";
 import { Client } from "./Client";
 
-
-@Entity("client_allowed_url")
-export class ClientAllowedUrl {
-
-    @PrimaryGeneratedColumn()
-    id?: string;
-
-    @ManyToOne(() => Client, (client) => client.allowedUrls)
-    @JoinColumn({ name: "client_id" })
-    client?: Client;
-
-    @Column()
-    url?: string;
+export class ClientAllowedUrl extends Model {
+    declare clientId: string;
+    declare url: string;
+    declare clients: Client[];
 }
+
+ClientAllowedUrl.init({
+    id: {
+        primaryKey: true,
+        type: STRING
+    },
+    clientId: STRING,
+    url: STRING
+}, {
+    sequelize,
+    tableName: 'client_allowed_url',
+});

@@ -1,21 +1,38 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Role } from "./Role";
+import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '../database';
+import { Role } from './Role';
 
-@Entity('groups')
-export class Group {
-    @PrimaryGeneratedColumn('uuid')
-    id?: string;
-
-    @Column()
-    name?: string;
-
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt?: Date;
-
-    @Column({ name: 'last_update' })
-    lastUpdate?: Date;
-
-    @ManyToMany(() => Role, { eager: true })
-    @JoinTable({ name: 'group_roles', joinColumn: { name: 'group_id', referencedColumnName: 'id' }, inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' } })
-    roles?: Role[];
+export class Group extends Model {
+    declare id: string;
+    declare name: string;
+    declare createdAt: Date;
+    declare lastUpdate: Date;
+    declare roles: Role[];
 }
+
+Group.init({
+    id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    lastUpdate: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+}, {
+    sequelize,
+    tableName: 'group'
+});
+
+Group.hasMany(Role, {
+    as: 'roles'
+});

@@ -1,27 +1,35 @@
-import { Column, Entity, JoinColumn, JoinTable, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { DATE, Model, STRING } from "sequelize";
+import { sequelize } from "../database";
 import { ClientAllowedUrl } from "./ClientAllowedUrl";
 
-@Entity('clients')
-export class Client {
-
-    @PrimaryGeneratedColumn('uuid')
-    id?: string;
-
-    @Column()
-    name?: string;
-
-    @Column()
-    url?: string;
-
-    @OneToMany(() => ClientAllowedUrl, (clientAllowedUrl) => clientAllowedUrl.client, { eager: true })
-    allowedUrls?: ClientAllowedUrl[]
-
-    @Column({ name: "client_id" })
-    clientId?: string;
-
-    @Column({ name: "client_secret" })
-    clientSecret?: string;
-
-    @Column({ name: "created_at" })
-    createdAt?: Date;
+export class Client extends Model {
+    declare id: string;
+    declare name: string;
+    declare url: string;
+    declare clientSecret: string;
+    declare allowedUrls: ClientAllowedUrl[];
+    declare createdAt: Date;
 }
+
+Client.init({
+    id: {
+        type: STRING,
+        primaryKey: true,
+        allowNull: false,
+    },
+    name: {
+        type: STRING,
+    },
+    url: {
+        type: STRING,
+    },
+    clientSecret: {
+        type: STRING,
+    },
+    createdAt: {
+        type: DATE,
+    },
+}, {
+    sequelize,
+    tableName: 'client'
+},);

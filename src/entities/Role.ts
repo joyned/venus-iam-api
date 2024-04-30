@@ -1,13 +1,27 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { DataTypes, Model } from "sequelize";
+import { sequelize } from "../database";
 
-@Entity('roles')
-export class Role {
-    @PrimaryGeneratedColumn('uuid')
-    id?: string;
-
-    @Column()
-    name?: string;
-
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt?: Date;
+export class Role extends Model {
+    declare id: string;
+    declare name: string;
+    declare createdAt: Date;
 }
+
+Role.init({
+    id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+}, {
+    sequelize,
+    tableName: 'group'
+});

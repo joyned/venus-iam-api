@@ -1,7 +1,6 @@
-import { AppDataSource } from "../database";
+import { sequelize } from "../database";
 import { Role } from "../entities/Role";
 import { NotEditableItem } from "../exceptions/NotEditableItem";
-import { RoleRepository } from "../repositories/RoleRepository";
 import { SystemConstants } from "../systemConfig/SystemConstants";
 
 export class RoleService {
@@ -9,11 +8,11 @@ export class RoleService {
     private readonly systemRoles = SystemConstants.systemRoles;
 
     async findAll(): Promise<Role[]> {
-        return await RoleRepository.find();
+        return await Role.findAll();
     }
 
     async findById(id: string): Promise<Role | null> {
-        return await RoleRepository.findOneBy({ id: id });
+        return await Role.findOne({ where: { id: id } });
     }
 
     async persist(role: Role): Promise<string | undefined> {
@@ -21,7 +20,7 @@ export class RoleService {
             throw new NotEditableItem(`Unable to modify role ${role.name}`);
         }
 
-        const persistedRole = await RoleRepository.save(role);
+        const persistedRole = await role.save();
         return persistedRole.id;
     }
 
@@ -32,20 +31,20 @@ export class RoleService {
             throw new NotEditableItem(`Unable to delete role ${role?.name}`);
         }
 
-        return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-            await transactionalEntityManager.query("DELETE FROM venus.group_roles WHERE role_id = $1", [roleId])
-            const response = await transactionalEntityManager.getRepository(Role)
-                .createQueryBuilder()
-                .delete()
-                .where("id = :id", { id: roleId })
-                .execute();
+        return await sequelize.transaction(async t => {
+            sequelize.query('DELETE FROM venus.group_roles WHERE role_id = ?', {
+                replacements: [roleId],
+                transaction: t
+            });
 
-            if (response.affected === 1) {
+            const r = await Role.destroy({ where: { id: roleId } });
+
+            if (r) {
                 return roleId;
             }
 
             return undefined;
-        });
+        })
     }
 
     private canNotEditRole(role: Role | null) {

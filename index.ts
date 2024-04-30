@@ -1,25 +1,25 @@
+import cors from "cors";
 import express from "express";
-import { AppDataSource } from './src/database'
-import routes from "./src/routes";
-import "./src/logger"
+import "./src/logger";
 import { loggerFactory } from "./src/logger";
-import cors from 'cors';
+import routes from "./src/routes";
 import { SystemConfig } from "./src/systemConfig/SystemConfig";
+import { associations } from "./src/entities/Associations";
 
 const logger = loggerFactory(__filename);
 const systemConfig = new SystemConfig();
 
-AppDataSource.initialize().then(() => {
-    return systemConfig.start().then(() => {
-        const app = express();
+systemConfig.start().then(() => {
+    associations()
 
-        app.use(cors())
-        app.use(express.json());
+    const app = express();
 
-        app.use(routes);
+    app.use(cors())
+    app.use(express.json());
 
-        return app.listen(process.env.SERVER_PORT || 3000, () => {
-            logger.info(`Server is running on port ${process.env.SERVER_PORT || 3000}...`)
-        });
+    app.use(routes);
+
+    return app.listen(process.env.SERVER_PORT || 3000, () => {
+        logger.info(`Server is running on port ${process.env.SERVER_PORT || 3000}...`)
     });
-})
+});

@@ -1,28 +1,45 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Group } from "./Group";
+import { sequelize } from "../database";
 
-@Entity("users")
-export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id?: string;
+const { DataTypes, Model } = require('sequelize');
+const Group = require('./Group');
 
-    @Column()
-    name?: string;
-
-    @Column()
-    email?: string;
-
-    @Column()
-    password?: string;
-
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt?: Date;
-
-    @Column({ name: 'is_blocked' })
-    isBlocked?: boolean;
-
-    @ManyToMany(() => Group, { eager: true })
-    @JoinTable({ name: 'user_groups', joinColumn: { name: 'user_id', referencedColumnName: 'id' }, inverseJoinColumn: { name: 'group_id', referencedColumnName: 'id' } })
-    groups?: Group[];
-
+export class User extends Model {
+    declare id: string;
+    declare name: string;
+    declare email: string;
+    declare password: string;
+    declare createdAt: Date;
+    declare isBlocked: Boolean;
 }
+
+User.init({
+    id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    isBlocked: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+    },
+}, {
+    sequelize,
+    tableName: 'user'
+});
+

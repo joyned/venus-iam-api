@@ -1,21 +1,19 @@
 import { v4 } from "uuid";
-import { AppDataSource } from "../database";
 import { Group } from "../entities/Group";
-import { DeletionError } from "../exceptions/DeletionError";
-import { GroupRepository } from "../repositories/GroupRepository";
-import { SystemConstants } from "../systemConfig/SystemConstants";
 import { NotEditableItem } from "../exceptions/NotEditableItem";
+import { SystemConstants } from "../systemConfig/SystemConstants";
+import { sequelize } from "../database";
 
 export class GroupService {
 
     private readonly systemGroups = SystemConstants.systemGroups;
 
     async findAll(): Promise<Group[]> {
-        return await GroupRepository.find();
+        return await Group.findAll();
     }
 
     async findById(id: string): Promise<Group | null> {
-        return await GroupRepository.findOneBy({ id: id });
+        return await Group.findOne({ where: { id: id } });
     }
 
     async persist(group: Group): Promise<string | undefined> {
@@ -33,7 +31,7 @@ export class GroupService {
 
         group.lastUpdate = new Date();
 
-        const persistedGroup = await GroupRepository.save(group);
+        const persistedGroup = await group.save();
         return persistedGroup.id;
     }
 
@@ -44,21 +42,25 @@ export class GroupService {
             throw new NotEditableItem(`Unable to delete role ${group?.name}`);
         }
 
-        return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-            await transactionalEntityManager.query("DELETE FROM venus.user_groups WHERE group_id = $1", [groupId])
-            await transactionalEntityManager.query("DELETE FROM venus.group_roles WHERE group_id = $1", [groupId])
-            const response = await transactionalEntityManager.getRepository(Group)
-                .createQueryBuilder()
-                .delete()
-                .where("id = :id", { id: groupId })
-                .execute();
+        return await sequelize.transaction(async t => {
+            sequelize.query('DELETE FROM venus.user_groups WHERE group_id = ?', {
+                replacements: [groupId],
+                transaction: t
+            });
 
-            if (response.affected === 1) {
+            sequelize.query('DELETE FROM venus.group_roles WHERE group_id = ?', {
+                replacements: [groupId],
+                transaction: t
+            });
+
+            const r = await Group.destroy({ where: { id: groupId } });
+
+            if (r) {
                 return groupId;
             }
 
             return undefined;
-        })
+        });
     }
 
     private canNotEditGroup(group: Group | null) {
