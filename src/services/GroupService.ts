@@ -14,7 +14,7 @@ export class GroupService {
     }
 
     async findById(id: string): Promise<Group | null> {
-        return await Group.findOne({ where: { id: id } });
+        return await Group.findOne({ where: { id: id }, include: { association: 'roles' } });
     }
 
     async persist(group: Group): Promise<string | undefined> {

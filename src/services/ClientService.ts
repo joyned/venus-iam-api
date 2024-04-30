@@ -8,7 +8,7 @@ export class ClientService {
     }
 
     async findById(id: string): Promise<Client | null> {
-        let client = await Client.findOne({ where: { id: id }, include: { association: 'clientAllowedUrls' } });
+        let client = await Client.findOne({ where: { id: id }, include: { model: ClientAllowedUrl, as: 'clientAllowedUrls', attributes: ['url'] } });
         client?.get({ plain: true })
         return client;
     }

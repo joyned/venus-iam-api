@@ -9,7 +9,7 @@ export class UserService {
     }
 
     async findById(id: string): Promise<User | null> {
-        return await User.findOne({ where: { id: id } });
+        return await User.findOne({ where: { id: id }, include: { association: 'groups' } });
     }
 
     async persist(user: User): Promise<User> {
