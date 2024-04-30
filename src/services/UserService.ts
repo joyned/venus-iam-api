@@ -5,7 +5,7 @@ import { sequelize } from "../database";
 export class UserService {
 
     async findAll(): Promise<User[]> {
-        return await User.findAll();
+        return await User.findAll({ include: { association: 'groups' } });
     }
 
     async findById(id: string): Promise<User | null> {

@@ -3,13 +3,14 @@ import { Group } from "../entities/Group";
 import { NotEditableItem } from "../exceptions/NotEditableItem";
 import { SystemConstants } from "../systemConfig/SystemConstants";
 import { sequelize } from "../database";
+import { Role } from "../entities/Role";
 
 export class GroupService {
 
     private readonly systemGroups = SystemConstants.systemGroups;
 
     async findAll(): Promise<Group[]> {
-        return await Group.findAll();
+        return await Group.findAll({ include: { association: 'roles' } });
     }
 
     async findById(id: string): Promise<Group | null> {

@@ -1,7 +1,5 @@
 import { sequelize } from "../database";
-
-const { DataTypes, Model } = require('sequelize');
-const Group = require('./Group');
+import { DataTypes, Model } from "sequelize";
 
 export class User extends Model {
     declare id: string;

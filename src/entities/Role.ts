@@ -23,5 +23,5 @@ Role.init({
     },
 }, {
     sequelize,
-    tableName: 'group'
+    tableName: 'role'
 });

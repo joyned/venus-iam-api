@@ -32,7 +32,3 @@ Group.init({
     sequelize,
     tableName: 'group'
 });
-
-Group.hasMany(Role, {
-    as: 'roles'
-});
