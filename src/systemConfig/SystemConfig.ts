@@ -2,8 +2,11 @@ import { v4 } from "uuid";
 import { Group } from "../entities/Group";
 import { Role } from "../entities/Role";
 import { System } from "../entities/System";
-import { loggerFactory } from "../logger";
+import { GroupRepository } from "../repositories/GroupRepository";
+import { RoleRepository } from "../repositories/RoleRepository";
+import { SystemRepository } from "../repositories/SystemRepository";
 import { SystemConstants } from "./SystemConstants";
+import { loggerFactory } from "../logger";
 
 class SystemCreatedRole {
     systemAdministratorRole: Role;
@@ -21,12 +24,12 @@ export class SystemConfig {
     private readonly systemVersion: string = '1.0.0';
 
     async getSystemInfo() {
-        return System.findOne({ where: { id: 1 } })
+        return SystemRepository.findById(1);
     }
 
     async start() {
         try {
-            if (! await this.alreadyConfigured()) {
+            if (!await this.alreadyConfigured()) {
                 this.logger.info(`Configuring System. Please wait...`);
                 const roles = await this.createSystemRoles();
                 await this.createGroups(roles);
@@ -40,19 +43,32 @@ export class SystemConfig {
     }
 
     private async createSystemRoles(): Promise<SystemCreatedRole> {
-        const systemAdministratorRole = new Role();
-        const systemViewerRole = new Role();
+        let result = undefined;
+        let systemAdministratorRole = new Role();
+        let systemViewerRole = new Role();
 
-        systemAdministratorRole.id = v4();
         systemAdministratorRole.name = SystemConstants.systemAdministratorRoleName;
         systemAdministratorRole.createdAt = new Date();
 
-        systemViewerRole.id = v4();
         systemViewerRole.name = SystemConstants.systemViewerRoleName;
         systemViewerRole.createdAt = new Date();
 
-        await systemAdministratorRole.save()
-        await systemViewerRole.save()
+        result = await RoleRepository.persist(systemAdministratorRole);
+
+        if (result) {
+            systemAdministratorRole = result;
+        } else {
+            throw new Error('Failed to start Application...')
+        }
+
+        result = await RoleRepository.persist(systemViewerRole);
+
+        if (result) {
+            systemViewerRole = result;
+        } else {
+            throw new Error('Failed to start Application...')
+        }
+
 
         return {
             systemAdministratorRole: systemAdministratorRole,
@@ -61,35 +77,33 @@ export class SystemConfig {
     }
 
     private async createGroups(roles: SystemCreatedRole) {
-        const systemAdministratorGroup = new Group();
-        const systemViewerGroup = new Group();
+        let systemAdministratorGroup = new Group();
+        let systemViewerGroup = new Group();
 
-        systemAdministratorGroup.id = v4();
         systemAdministratorGroup.name = SystemConstants.systemAdministratorGroupName;
         systemAdministratorGroup.roles = [roles.systemAdministratorRole];
         systemAdministratorGroup.createdAt = new Date();
         systemAdministratorGroup.lastUpdate = new Date();
 
-        systemViewerGroup.id = v4();
         systemViewerGroup.name = SystemConstants.systemViewerGroupName;
         systemViewerGroup.roles = [roles.systemViewerRole];
         systemViewerGroup.createdAt = new Date();
         systemViewerGroup.lastUpdate = new Date();
 
-        await systemAdministratorGroup.save();
-        await systemViewerGroup.save();
+        await GroupRepository.persist(systemAdministratorGroup)
+        await GroupRepository.persist(systemViewerGroup)
     }
 
     private async createSystemConfigs() {
         const system = new System();
-        system.set('id', 1);
-        system.set('version', this.systemVersion)
+        system.id = "1";
+        system.version = this.systemVersion;
 
-        await system.save();
+        await SystemRepository.persist(system);
     }
 
     private async alreadyConfigured(): Promise<boolean> {
-        const system = await System.findOne({ where: { id: 1 } });
+        const system = await SystemRepository.findById(1);
         if (system) {
             this.logger.info(`System configured. Version ${system.get('version')}`);
             return true;

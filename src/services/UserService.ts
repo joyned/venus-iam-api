@@ -1,18 +1,25 @@
 import { v4 } from "uuid";
 import { User } from "../entities/User";
-import { sequelize } from "../database";
+import { UserRepository } from "../repositories/UserRepository";
+import { UserGroupRepository } from "../repositories/UserRoleRepository";
+import { Group } from "../entities/Group";
+import { GroupRepository } from "../repositories/GroupRepository";
 
 export class UserService {
 
     async findAll(): Promise<User[]> {
-        return await User.findAll({ include: { association: 'groups' } });
+        return await UserRepository.findAll();
     }
 
-    async findById(id: string): Promise<User | null> {
-        return await User.findOne({ where: { id: id }, include: { association: 'groups' } });
+    async findById(id: string): Promise<User> {
+        const user: User = await UserRepository.findById(id);
+        const groups: Group[] = await GroupRepository.findGroupsByUserId(id);
+        user.groups = []
+        groups.forEach(group => user.groups.push(group));
+        return user;
     }
 
-    async persist(user: User): Promise<User> {
+    async persist(user: User): Promise<User | undefined> {
         if (!user.createdAt) {
             user.createdAt = new Date();
         }
@@ -21,25 +28,23 @@ export class UserService {
             user.id = v4();
         }
 
-        const newUser = await user.save();
-        return newUser;
+        const persistedUser = await UserRepository.persist(user);
+        if (persistedUser) {
+            await UserGroupRepository.persist(persistedUser.id, persistedUser.groups);
+            return persistedUser;
+        }
+        return undefined;
     }
 
 
     async delete(id: string): Promise<string | undefined> {
-        return await sequelize.transaction(async t => {
-            sequelize.query('DELETE FROM venus.user_groups WHERE user_id = ?', {
-                replacements: [id],
-                transaction: t
-            });
+        await UserGroupRepository.destroy(id);
+        const result = await UserRepository.destroy(id);
 
-            const r = await User.destroy({ where: { id: id } });
+        if (result) {
+            return id;
+        }
 
-            if (r) {
-                return id;
-            }
-
-            return undefined;
-        })
+        return undefined;
     }
 }

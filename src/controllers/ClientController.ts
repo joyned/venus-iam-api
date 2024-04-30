@@ -1,15 +1,16 @@
 import { Router } from "express";
 import { ClientService } from "../services/ClientService";
+import { mapClientsToDTO, mapClientToDTO } from "./mapper";
 
 const clientController = Router();
 const service = new ClientService();
 
 clientController.get('/', async (req, res) => {
-    return res.json(await service.findAll());
+    return res.json(mapClientsToDTO(await service.findAll()));
 });
 
 clientController.get('/:id', async (req, res) => {
-    return res.json(await service.findById(req.params.id));
+    return res.json(mapClientToDTO(await service.findById(req.params.id)));
 });
 
 clientController.post('/', async (req, res) => {

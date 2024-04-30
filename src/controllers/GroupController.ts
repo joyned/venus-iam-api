@@ -1,17 +1,18 @@
 import { Router } from "express";
 import { GroupService } from "../services/GroupService";
 import { loggerFactory } from "../logger";
+import { mapGroupsToDTO, mapGroupToDTO } from "./mapper";
 
 const groupController = Router();
 const service = new GroupService();
 const logger = loggerFactory(__filename)
 
 groupController.get('/', async (req, res) => {
-    return res.json(await service.findAll());
+    return res.json(mapGroupsToDTO(await service.findAll()));
 });
 
 groupController.get('/:id', async (req, res) => {
-    return res.json(await service.findById(req.params.id));
+    return res.json(mapGroupToDTO(await service.findById(req.params.id)));
 });
 
 groupController.post('/', async (req, res) => {

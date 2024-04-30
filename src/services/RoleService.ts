@@ -1,6 +1,7 @@
-import { sequelize } from "../database";
 import { Role } from "../entities/Role";
 import { NotEditableItem } from "../exceptions/NotEditableItem";
+import { GroupRoleRepository } from "../repositories/GroupRoleRepository";
+import { RoleRepository } from "../repositories/RoleRepository";
 import { SystemConstants } from "../systemConfig/SystemConstants";
 
 export class RoleService {
@@ -8,20 +9,19 @@ export class RoleService {
     private readonly systemRoles = SystemConstants.systemRoles;
 
     async findAll(): Promise<Role[]> {
-        return await Role.findAll();
+        return await RoleRepository.findAll();
     }
 
-    async findById(id: string): Promise<Role | null> {
-        return await Role.findOne({ where: { id: id } });
+    async findById(id: string): Promise<Role> {
+        return await RoleRepository.findById(id);
     }
 
     async persist(role: Role): Promise<string | undefined> {
         if (this.canNotEditRole(role)) {
             throw new NotEditableItem(`Unable to modify role ${role.name}`);
         }
-
-        const persistedRole = await role.save();
-        return persistedRole.id;
+        const persistedRole = await RoleRepository.persist(role);
+        return persistedRole?.id;
     }
 
     async delete(roleId: string): Promise<string | undefined> {
@@ -31,20 +31,14 @@ export class RoleService {
             throw new NotEditableItem(`Unable to delete role ${role?.name}`);
         }
 
-        return await sequelize.transaction(async t => {
-            sequelize.query('DELETE FROM venus.group_roles WHERE role_id = ?', {
-                replacements: [roleId],
-                transaction: t
-            });
+        await GroupRoleRepository.destroy(role.id);
+        const result = await RoleRepository.destroy(roleId);
 
-            const r = await Role.destroy({ where: { id: roleId } });
+        if (result) {
+            return roleId;
+        }
 
-            if (r) {
-                return roleId;
-            }
-
-            return undefined;
-        })
+        return undefined;
     }
 
     private canNotEditRole(role: Role | null) {

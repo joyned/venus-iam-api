@@ -1,35 +1,20 @@
-import { DATE, Model, STRING } from "sequelize";
-import { sequelize } from "../database";
-import { ClientAllowedUrl } from "./ClientAllowedUrl";
 
-export class Client extends Model {
+export class Client {
     declare id: string;
     declare name: string;
     declare url: string;
     declare clientSecret: string;
-    declare allowedUrls: ClientAllowedUrl[];
+    declare allowedUrls: string[];
     declare createdAt: Date;
-}
 
-Client.init({
-    id: {
-        type: STRING,
-        primaryKey: true,
-        allowNull: false,
-    },
-    name: {
-        type: STRING,
-    },
-    url: {
-        type: STRING,
-    },
-    clientSecret: {
-        type: STRING,
-    },
-    createdAt: {
-        type: DATE,
-    },
-}, {
-    sequelize,
-    tableName: 'client'
-},);
+    constructor(data?: any) {
+        if (data) {
+            this.id = data.id;
+            this.name = data.name;
+            this.url = data.url;
+            this.clientSecret = data.client_secret;
+            this.allowedUrls = data.allowed_urls;
+            this.createdAt = new Date(data.created_at);
+        }
+    }
+}

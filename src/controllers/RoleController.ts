@@ -1,18 +1,18 @@
 import { Router } from "express";
-import { RoleService } from "../services/RoleService";
-import { Role } from "../entities/Role";
 import { v4 } from "uuid";
-import { DeletionError } from "../exceptions/DeletionError";
+import { Role } from "../entities/Role";
+import { RoleService } from "../services/RoleService";
+import { mapRolesToDTO, mapRoleToDTO } from "./mapper";
 
 const roleController = Router();
 const service = new RoleService();
 
 roleController.get('/', async (req, res) => {
-    return res.json(await service.findAll());
+    return res.json(mapRolesToDTO(await service.findAll()));
 });
 
 roleController.get('/:roleId', async (req, res) => {
-    return res.json(await service.findById(req.params.roleId));
+    return res.json(mapRoleToDTO(await service.findById(req.params.roleId)));
 });
 
 roleController.post('/', async (req, res) => {

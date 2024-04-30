@@ -1,34 +1,19 @@
-import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../database';
 import { Role } from './Role';
 
-export class Group extends Model {
+export class Group {
     declare id: string;
     declare name: string;
     declare createdAt: Date;
     declare lastUpdate: Date;
     declare roles: Role[];
-}
 
-Group.init({
-    id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-    },
-    lastUpdate: {
-        type: DataTypes.DATE,
-        allowNull: false,
-    },
-}, {
-    sequelize,
-    tableName: 'group'
-});
+    constructor(data?: any) {
+        if (data) {
+            this.id = data.id;
+            this.name = data.name;
+            this.createdAt = new Date(data.created_at);
+            this.lastUpdate = new Date(data.last_update);
+            this.roles = data.roles.map((roleData: any) => new Role(roleData));
+        }
+    }
+}

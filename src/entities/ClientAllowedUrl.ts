@@ -1,21 +1,15 @@
-import { Model, STRING } from "sequelize";
-import { sequelize } from "../database";
 import { Client } from "./Client";
 
-export class ClientAllowedUrl extends Model {
+export class ClientAllowedUrl {
     declare clientId: string;
     declare url: string;
     declare clients: Client[];
-}
 
-ClientAllowedUrl.init({
-    id: {
-        primaryKey: true,
-        type: STRING
-    },
-    clientId: STRING,
-    url: STRING
-}, {
-    sequelize,
-    tableName: 'client_allowed_url',
-});
+    constructor(data?: any) {
+        if (data) {
+            this.clientId = data.client_id;
+            this.url = data.url;
+            this.clients = data.clients.map((clientData: any) => new Client(clientData));
+        }
+    }
+}

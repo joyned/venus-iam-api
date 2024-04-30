@@ -1,17 +1,14 @@
 import cors from "cors";
 import express from "express";
 import "./src/logger";
-import { loggerFactory } from "./src/logger";
+import { loggerFactory } from "./src/logger/index";
 import routes from "./src/routes";
 import { SystemConfig } from "./src/systemConfig/SystemConfig";
-import { associations } from "./src/entities/Associations";
 
 const logger = loggerFactory(__filename);
 const systemConfig = new SystemConfig();
 
 systemConfig.start().then(() => {
-    associations()
-
     const app = express();
 
     app.use(cors())
@@ -23,3 +20,4 @@ systemConfig.start().then(() => {
         logger.info(`Server is running on port ${process.env.SERVER_PORT || 3000}...`)
     });
 });
+

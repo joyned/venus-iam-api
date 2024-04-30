@@ -1,20 +1,12 @@
-import { Model, STRING } from "sequelize";
-import { sequelize } from "../database";
 
-export class System extends Model {
+export class System {
     declare id: string;
     declare version: string;
-}
 
-System.init({
-    id: {
-        type: STRING,
-        primaryKey: true
-    },
-    version: {
-        type: STRING,
+    constructor(data?: any) {
+        if (data) {
+            this.id = data.id;
+            this.version = data.version;
+        }
     }
-}, {
-    sequelize,
-    tableName: 'system'
-});
+}

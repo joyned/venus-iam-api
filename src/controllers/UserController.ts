@@ -1,15 +1,16 @@
 import { Router } from "express";
 import { UserService } from "../services/UserService";
+import { mapUsersToDTO, mapUserToDTO } from "./mapper";
 
 const userController = Router();
 const service = new UserService();
 
 userController.get('/', async (req, res) => {
-    return res.json(await service.findAll());
+    return res.json(mapUsersToDTO(await service.findAll()));
 });
 
 userController.get('/:id', async (req, res) => {
-    return res.json(await service.findById(req.params.id));
+    return res.json(mapUserToDTO(await service.findById(req.params.id)));
 });
 
 userController.post('/', async (req, res) => {
