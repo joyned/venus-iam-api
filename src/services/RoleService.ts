@@ -2,6 +2,7 @@ import { Role } from "../entities/Role";
 import { NotEditableItem } from "../exceptions/NotEditableItem";
 import { GroupRoleRepository } from "../repositories/GroupRoleRepository";
 import { RoleRepository } from "../repositories/RoleRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
 import { SystemConstants } from "../systemConfig/SystemConstants";
 
 export class RoleService {
@@ -20,6 +21,7 @@ export class RoleService {
         if (this.canNotEditRole(role)) {
             throw new NotEditableItem(`Unable to modify role ${role.name}`);
         }
+
         const persistedRole = await RoleRepository.persist(role);
         return persistedRole?.id;
     }
@@ -31,14 +33,16 @@ export class RoleService {
             throw new NotEditableItem(`Unable to delete role ${role?.name}`);
         }
 
-        await GroupRoleRepository.destroy(role.id);
-        const result = await RoleRepository.destroy(roleId);
+        return await TransactionRepository.run(async () => {
+            await GroupRoleRepository.destroy(role.id);
+            const result = await RoleRepository.destroy(roleId);
 
-        if (result) {
-            return roleId;
-        }
+            if (result) {
+                return roleId;
+            }
 
-        return undefined;
+            return undefined;
+        });
     }
 
     private canNotEditRole(role: Role | null) {

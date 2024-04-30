@@ -1,8 +1,9 @@
 import { v4 } from "uuid";
 import { Client } from "../entities/Client";
-import { ClientRepository } from "../repositories/ClientRepository";
 import { ClientAllowedUrl } from "../entities/ClientAllowedUrl";
 import { ClientAllowedUrlRepository } from "../repositories/ClientAllowedUrlRepository";
+import { ClientRepository } from "../repositories/ClientRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
 
 export class ClientService {
 
@@ -31,16 +32,23 @@ export class ClientService {
             client.clientSecret = v4();
         }
 
+        await ClientAllowedUrlRepository.destroy(client.id);
         const createdClient = await ClientRepository.persist(client);
 
         if (createdClient) {
+            await ClientAllowedUrlRepository.persist(client.id, client.allowedUrls);
             return createdClient.id;
         }
         return undefined;
     }
 
     async delete(id: string) {
-        const result = ClientRepository.destroy(id);
-        console.log(result);
+        return await TransactionRepository.run(async () => {
+            const result = await ClientRepository.destroy(id);
+            if (result) {
+                return id;
+            }
+            return undefined;
+        });
     }
 }

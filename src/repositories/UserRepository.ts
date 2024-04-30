@@ -1,3 +1,4 @@
+import { v4 } from "uuid";
 import { pool } from "../database/index";
 import { User } from "../entities/User";
 import { UserGroupRepository } from "./UserRoleRepository";
@@ -10,28 +11,26 @@ const DELETE = `DELETE FROM venus."user" WHERE id=$1`
 export class UserRepository {
     static async findAll() {
         const result = await pool.query(FIND);
-        
+
         return result.rows;
     }
 
     static async findById(id: string) {
         const result = await pool.query(`${FIND} WHERE id = $1`, [id]);
-        
+
         return result.rows[0]
     }
 
     static async persist(user: User) {
         let result = undefined;
 
-        await UserGroupRepository.destroy(user.id);
-
         if (!user.id) {
+            user.id = v4()
+            user.createdAt = new Date();
             result = await pool.query(INSERT, [user.id, user.name, user.email, user.password]);
         } else {
             result = await pool.query(UPDATE, [user.id, user.name, user.email, user.password, user.isBlocked]);
         }
-
-        await UserGroupRepository.persist(user.id, user.groups);
 
         if (result.rowCount == 1) {
             return user;
@@ -42,7 +41,11 @@ export class UserRepository {
 
     static async destroy(id: string) {
         const result = await pool.query(DELETE, [id]);
-        
-        return result.rows[0]
+
+        if (result.rowCount == 1) {
+            return id;
+        }
+
+        return undefined;
     }
 }

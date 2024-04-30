@@ -4,6 +4,7 @@ import { UserRepository } from "../repositories/UserRepository";
 import { UserGroupRepository } from "../repositories/UserRoleRepository";
 import { Group } from "../entities/Group";
 import { GroupRepository } from "../repositories/GroupRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
 
 export class UserService {
 
@@ -20,14 +21,7 @@ export class UserService {
     }
 
     async persist(user: User): Promise<User | undefined> {
-        if (!user.createdAt) {
-            user.createdAt = new Date();
-        }
-
-        if (!user.id) {
-            user.id = v4();
-        }
-
+        await UserGroupRepository.destroy(user.id);
         const persistedUser = await UserRepository.persist(user);
         if (persistedUser) {
             await UserGroupRepository.persist(persistedUser.id, persistedUser.groups);
@@ -38,13 +32,15 @@ export class UserService {
 
 
     async delete(id: string): Promise<string | undefined> {
-        await UserGroupRepository.destroy(id);
-        const result = await UserRepository.destroy(id);
+        return await TransactionRepository.run(async () => {
+            await UserGroupRepository.destroy(id);
+            const result = await UserRepository.destroy(id);
 
-        if (result) {
-            return id;
-        }
+            if (result) {
+                return id;
+            }
 
-        return undefined;
+            return undefined;
+        });
     }
 }

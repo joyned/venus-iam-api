@@ -1,7 +1,6 @@
 import { v4 } from "uuid";
 import { pool } from "../database/index";
 import { Group } from "../entities/Group";
-import { GroupRoleRepository } from "./GroupRoleRepository";
 
 const FIND = `SELECT id, "name", created_at, last_update FROM venus."group"`
 const FIND_GROUPS_BY_USER = `select g.* from venus."group" g join venus.user_group ug  on ug.group_id = g.id and ug.user_id = $1`
@@ -30,16 +29,12 @@ export class GroupRepository {
     static async persist(group: Group) {
         let result = undefined;
 
-        await GroupRoleRepository.destroy(group.id);
-
         if (!group.id) {
             group.id = v4();
             result = await pool.query(INSERT, [group.id, group.name]);
         } else {
             result = await pool.query(UPDATE, [group.id, group.name]);
         }
-
-        await GroupRoleRepository.persist(group.id, group.roles);
 
         if (result.rowCount == 1) {
             return group;
@@ -50,7 +45,10 @@ export class GroupRepository {
 
     static async destroy(id: string) {
         const result = await pool.query(DELETE, [id]);
+        if (result.rowCount == 1) {
+            return id;
+        }
 
-        return result.rows[0];
+        return undefined;
     }
 }

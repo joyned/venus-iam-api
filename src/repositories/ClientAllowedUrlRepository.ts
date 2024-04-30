@@ -23,6 +23,10 @@ export class ClientAllowedUrlRepository {
 
     static async destroy(id: string) {
         const result = await pool.query(DELETE, [id]);
+        if (result.rowCount == 1) {
+            return id;
+        }
 
+        return undefined;
     }
 }

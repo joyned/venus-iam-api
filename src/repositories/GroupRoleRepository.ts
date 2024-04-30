@@ -24,6 +24,10 @@ export class GroupRoleRepository {
 
     static async destroy(groupId: string) {
         const result = await pool.query(DELETE, [groupId]);
+        if (result.rowCount == 1) {
+            return groupId;
+        }
 
+        return undefined;
     }
 }

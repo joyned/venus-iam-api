@@ -12,20 +12,18 @@ export class ClientRepository {
     static async findAll() {
         let clients: Client[] = []
         const result = await pool.query(FIND);
-        
+
         return result.rows;
     }
 
     static async findById(id: string) {
         const result = await pool.query(`${FIND} WHERE id = $1`, [id]);
-        
+
         return result.rows[0];
     }
 
     static async persist(client: Client) {
         let result = undefined;
-
-        await ClientAllowedUrlRepository.destroy(client.id);
 
         if (!client.id) {
             client.id = v4()
@@ -33,10 +31,6 @@ export class ClientRepository {
         } else {
             result = await pool.query(UPDATE, [client.id, client.name, client.url]);
         }
-
-        await ClientAllowedUrlRepository.persist(client.id, client.allowedUrls);
-
-        
 
         if (result.rowCount == 1) {
             return client;
@@ -47,6 +41,10 @@ export class ClientRepository {
 
     static async destroy(id: string) {
         const result = await pool.query(DELETE, [id]);
-        
+        if (result.rowCount == 1) {
+            return id;
+        }
+
+        return undefined;
     }
 }

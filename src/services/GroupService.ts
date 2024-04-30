@@ -4,9 +4,10 @@ import { Role } from "../entities/Role";
 import { NotEditableItem } from "../exceptions/NotEditableItem";
 import { GroupRepository } from "../repositories/GroupRepository";
 import { GroupRoleRepository } from "../repositories/GroupRoleRepository";
+import { RoleRepository } from "../repositories/RoleRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
 import { UserGroupRepository } from "../repositories/UserRoleRepository";
 import { SystemConstants } from "../systemConfig/SystemConstants";
-import { RoleRepository } from "../repositories/RoleRepository";
 
 export class GroupService {
 
@@ -41,9 +42,12 @@ export class GroupService {
 
         group.lastUpdate = new Date();
 
+        await GroupRoleRepository.destroy(group.id);
+
         const persistedGroup = await GroupRepository.persist(group);
 
         if (persistedGroup) {
+            await GroupRoleRepository.persist(group.id, group.roles);
             return persistedGroup.id;
         }
         return undefined;
@@ -56,14 +60,16 @@ export class GroupService {
             throw new NotEditableItem(`Unable to delete role ${group?.name}`);
         }
 
-        await UserGroupRepository.destroy(group.id);
-        await GroupRoleRepository.destroy(group.id);
-        const result = await GroupRepository.destroy(groupId);
+        return await TransactionRepository.run(async () => {
+            await UserGroupRepository.destroy(group.id);
+            await GroupRoleRepository.destroy(group.id);
+            const result = await GroupRepository.destroy(groupId);
 
-        if (result) {
-            return groupId;
-        }
-        return undefined;
+            if (result) {
+                return groupId;
+            }
+            return undefined;
+        });
     }
 
     private canNotEditGroup(group: Group | null) {
