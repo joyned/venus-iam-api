@@ -4,7 +4,7 @@ export class Client {
     declare name: string;
     declare url: string;
     declare clientSecret: string;
-    declare allowedUrls: string[];
+    declare allowedUrls: any[];
     declare createdAt: Date;
 
     constructor(data?: any) {

@@ -27,6 +27,7 @@ export class ClientRepository {
 
         if (!client.id) {
             client.id = v4()
+            client.createdAt = new Date();
             result = await pool.query(INSERT, [client.id, client.name, client.url, client.clientSecret]);
         } else {
             result = await pool.query(UPDATE, [client.id, client.name, client.url]);

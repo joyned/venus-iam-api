@@ -14,6 +14,8 @@ export function mapClientToDTO(client: Client): ClientDTO {
         id: client.id,
         name: client.name,
         url: client.url,
+        clientId: client.id,
+        clientSecret: client.clientSecret,
         allowedUrls: client.allowedUrls?.map(url => url),
         createdAt: client.createdAt
     };

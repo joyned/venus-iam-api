@@ -1,7 +1,7 @@
 import { pool } from "../database";
 
-const FIND = `SELECT id, client_id, url FROM venus.client_allowed_url`
-const INSERT = `INSERT INTO venus.client_allowed_url (client_id, url) VALUES($1, $3);`;
+const FIND = `SELECT client_id, url FROM venus.client_allowed_url`
+const INSERT = `INSERT INTO venus.client_allowed_url (client_id, url) VALUES($1, $2);`;
 const DELETE = `DELETE FROM venus."client_allowed_url" WHERE client_id=$1`
 
 export class ClientAllowedUrlRepository {
@@ -15,9 +15,9 @@ export class ClientAllowedUrlRepository {
         return result.rows;
     }
 
-    static async persist(clientId: string, urls: string[]) {
-        urls.forEach(async url => {
-            await pool.query(INSERT, [clientId, url]);
+    static async persist(clientId: string, allowedUrls: any[]) {
+        allowedUrls.forEach(async allowedUrl => {
+            await pool.query(INSERT, [clientId, allowedUrl.url]);
         });
     }
 
