@@ -1,15 +1,15 @@
-import { pool } from "../database";
+import { executeQuery } from "./BaseRepository";
 
 export class TransactionRepository {
     static async run(runnable: any) {
         try {
-            await pool.query('BEGIN')
+            await executeQuery('BEGIN')
             const result = await runnable();
-            await pool.query('COMMIT');
+            await executeQuery('COMMIT');
             return result;
         } catch (error) {
             console.error(`Error while executing transaction! ${error}`);
-            await pool.query('ROLLBACK')
+            await executeQuery('ROLLBACK')
         }
     }
 }

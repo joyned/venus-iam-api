@@ -1,7 +1,6 @@
 import { v4 } from 'uuid';
-import { pool } from '../database/index';
 import { User } from '../entities/User';
-import { UserGroupRepository } from './UserRoleRepository';
+import { executeQuery } from './BaseRepository';
 
 const FIND = `SELECT id, "name", email, "password", created_at, is_blocked FROM venus."user"`;
 const INSERT =
@@ -12,19 +11,19 @@ const DELETE = `DELETE FROM venus."user" WHERE id=$1`;
 
 export class UserRepository {
   static async findAll() {
-    const result = await pool.query(FIND);
+    const result = await executeQuery(FIND);
 
     return result.rows;
   }
 
   static async findById(id: string) {
-    const result = await pool.query(`${FIND} WHERE id = $1`, [id]);
+    const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
     return result.rows[0];
   }
 
   static async findByEmail(email: string) {
-    const result = await pool.query(`${FIND} WHERE email = $1`, [email]);
+    const result = await executeQuery(`${FIND} WHERE email = $1`, [email]);
     return result.rows[0];
   }
 
@@ -34,14 +33,14 @@ export class UserRepository {
     if (!user.id) {
       user.id = v4();
       user.createdAt = new Date();
-      result = await pool.query(INSERT, [
+      result = await executeQuery(INSERT, [
         user.id,
         user.name,
         user.email,
         user.password,
       ]);
     } else {
-      result = await pool.query(UPDATE, [
+      result = await executeQuery(UPDATE, [
         user.id,
         user.name,
         user.email,
@@ -58,7 +57,7 @@ export class UserRepository {
   }
 
   static async destroy(id: string) {
-    const result = await pool.query(DELETE, [id]);
+    const result = await executeQuery(DELETE, [id]);
 
     if (result.rowCount == 1) {
       return id;

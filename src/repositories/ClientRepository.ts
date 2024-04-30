@@ -1,7 +1,6 @@
 import { v4 } from "uuid";
-import { pool } from "../database/index";
 import { Client } from "../entities/Client";
-import { ClientAllowedUrlRepository } from "./ClientAllowedUrlRepository";
+import { executeQuery } from "./BaseRepository";
 
 const FIND = `SELECT id, "name", url, client_secret, created_at FROM venus.client`
 const INSERT = `INSERT INTO venus.client (id, "name", url, client_secret, created_at) VALUES($1, $2, $3, $4, CURRENT_TIMESTAMP)`;
@@ -11,13 +10,13 @@ const DELETE = `DELETE FROM venus."client" WHERE id=$1`
 export class ClientRepository {
     static async findAll() {
         let clients: Client[] = []
-        const result = await pool.query(FIND);
+        const result = await executeQuery(FIND);
 
         return result.rows;
     }
 
     static async findById(id: string) {
-        const result = await pool.query(`${FIND} WHERE id = $1`, [id]);
+        const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
         return result.rows[0];
     }
@@ -28,9 +27,9 @@ export class ClientRepository {
         if (!client.id) {
             client.id = v4()
             client.createdAt = new Date();
-            result = await pool.query(INSERT, [client.id, client.name, client.url, client.clientSecret]);
+            result = await executeQuery(INSERT, [client.id, client.name, client.url, client.clientSecret]);
         } else {
-            result = await pool.query(UPDATE, [client.id, client.name, client.url]);
+            result = await executeQuery(UPDATE, [client.id, client.name, client.url]);
         }
 
         if (result.rowCount == 1) {
@@ -41,7 +40,7 @@ export class ClientRepository {
     }
 
     static async destroy(id: string) {
-        const result = await pool.query(DELETE, [id]);
+        const result = await executeQuery(DELETE, [id]);
         if (result.rowCount == 1) {
             return id;
         }

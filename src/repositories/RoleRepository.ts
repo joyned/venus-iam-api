@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
-import { pool } from '../database/index';
 import { Role } from '../entities/Role';
+import { executeQuery } from './BaseRepository';
 
 const FIND = 'SELECT id, "name", created_at FROM venus."role"';
 const FIND_ROLE_BY_GROUP_ID = `select r.* from venus."role" r join venus.group_role gr on r.id = gr.role_id and gr.group_id = $1`;
@@ -12,24 +12,24 @@ const DELETE = `DELETE FROM venus."role" WHERE id=$1`;
 
 export class RoleRepository {
   static async findAll() {
-    const result = await pool.query(FIND);
+    const result = await executeQuery(FIND);
 
     return result.rows;
   }
 
   static async findById(id: string) {
-    const result = await pool.query(`${FIND} WHERE id = $1`, [id]);
+    const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
     return result.rows[0];
   }
 
   static async findRolesByGroupId(groupId: string) {
-    const result = await pool.query(FIND_ROLE_BY_GROUP_ID, [groupId]);
+    const result = await executeQuery(FIND_ROLE_BY_GROUP_ID, [groupId]);
     return result.rows;
   }
 
   static async findRolesByUserId(userId: string) {
-    const result = await pool.query(FIND_ROLES_BY_USER_ID, [userId]);
+    const result = await executeQuery(FIND_ROLES_BY_USER_ID, [userId]);
     return result.rows;
   }
 
@@ -37,9 +37,9 @@ export class RoleRepository {
     let result = undefined;
     if (!role.id) {
       role.id = v4();
-      result = await pool.query(INSERT, [role.id, role.name]);
+      result = await executeQuery(INSERT, [role.id, role.name]);
     } else {
-      result = await pool.query(UPDATE, [role.id, role.name, role.createdAt]);
+      result = await executeQuery(UPDATE, [role.id, role.name, role.createdAt]);
     }
 
     if (result.rowCount == 1) {
@@ -50,7 +50,7 @@ export class RoleRepository {
   }
 
   static async destroy(id: string) {
-    const result = await pool.query(DELETE, [id]);
+    const result = await executeQuery(DELETE, [id]);
     if (result.rowCount == 1) {
       return id;
     }

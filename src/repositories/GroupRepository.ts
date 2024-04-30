@@ -1,6 +1,6 @@
 import { v4 } from "uuid";
-import { pool } from "../database/index";
 import { Group } from "../entities/Group";
+import { executeQuery } from "./BaseRepository";
 
 const FIND = `SELECT id, "name", created_at, last_update FROM venus."group"`
 const FIND_GROUPS_BY_USER = `select g.* from venus."group" g join venus.user_group ug  on ug.group_id = g.id and ug.user_id = $1`
@@ -10,19 +10,19 @@ const DELETE = `DELETE FROM venus."group" WHERE id=$1`
 
 export class GroupRepository {
     static async findAll() {
-        const result = await pool.query(FIND);
+        const result = await executeQuery(FIND);
 
         return result.rows;
     }
 
     static async findById(id: string) {
-        const result = await pool.query(`${FIND} WHERE id = $1`, [id]);
+        const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
         return result.rows[0]
     }
 
     static async findGroupsByUserId(userId: string) {
-        const result = await pool.query(FIND_GROUPS_BY_USER, [userId]);
+        const result = await executeQuery(FIND_GROUPS_BY_USER, [userId]);
         return result.rows;
     }
 
@@ -31,9 +31,9 @@ export class GroupRepository {
 
         if (!group.id) {
             group.id = v4();
-            result = await pool.query(INSERT, [group.id, group.name]);
+            result = await executeQuery(INSERT, [group.id, group.name]);
         } else {
-            result = await pool.query(UPDATE, [group.id, group.name]);
+            result = await executeQuery(UPDATE, [group.id, group.name]);
         }
 
         if (result.rowCount == 1) {
@@ -44,7 +44,7 @@ export class GroupRepository {
     }
 
     static async destroy(id: string) {
-        const result = await pool.query(DELETE, [id]);
+        const result = await executeQuery(DELETE, [id]);
         if (result.rowCount == 1) {
             return id;
         }
