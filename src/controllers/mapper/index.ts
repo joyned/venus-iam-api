@@ -3,11 +3,19 @@ import { ClientAllowedUrl } from '../../entities/ClientAllowedUrl';
 import { Group } from '../../entities/Group';
 import { Role } from '../../entities/Role';
 import { User } from '../../entities/User';
+import { AuthenticationDTO } from '../dto/AuthenticationDTO';
 import { ClientAllowedUrlDTO } from '../dto/ClientAllowedUrlDTO';
 import { ClientDTO } from '../dto/ClientDTO';
 import { GroupDTO } from '../dto/GroupDTO';
 import { RoleDTO } from '../dto/RoleDTO';
 import { UserDTO } from '../dto/UserDTO';
+
+export function mapAuthenticationToDTO(user: User, token: string): AuthenticationDTO {
+    return {
+        user: mapUserToDTO(user),
+        token: token
+    }
+};
 
 export function mapClientToDTO(client: Client): ClientDTO {
     return {

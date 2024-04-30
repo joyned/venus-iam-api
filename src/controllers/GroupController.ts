@@ -2,20 +2,21 @@ import { Router } from "express";
 import { GroupService } from "../services/GroupService";
 import { loggerFactory } from "../logger";
 import { mapGroupsToDTO, mapGroupToDTO } from "./mapper";
+import { authenticationMiddleware } from "../middleware/AuthenticationMiddleware";
 
 const groupController = Router();
 const service = new GroupService();
 const logger = loggerFactory(__filename)
 
-groupController.get('/', async (req, res) => {
+groupController.get('/', authenticationMiddleware(['SYSTEM_ADMIN', 'SYSTEM_VIEWER']), async (req, res) => {
     return res.json(mapGroupsToDTO(await service.findAll()));
 });
 
-groupController.get('/:id', async (req, res) => {
+groupController.get('/:id', authenticationMiddleware(['SYSTEM_ADMIN', 'SYSTEM_VIEWER']), async (req, res) => {
     return res.json(mapGroupToDTO(await service.findById(req.params.id)));
 });
 
-groupController.post('/', async (req, res) => {
+groupController.post('/', authenticationMiddleware(['SYSTEM_ADMIN']), async (req, res) => {
     try {
         return res.json(await service.persist(req.body));
     } catch (error) {
@@ -24,7 +25,7 @@ groupController.post('/', async (req, res) => {
     }
 });
 
-groupController.delete('/:id', async (req, res) => {
+groupController.delete('/:id', authenticationMiddleware(['SYSTEM_ADMIN']), async (req, res) => {
     try {
         const result = await service.delete(req.params.id);
         if (result) {

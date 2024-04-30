@@ -1,12 +1,11 @@
-import { v4 } from "uuid";
 import { Group } from "../entities/Group";
 import { Role } from "../entities/Role";
 import { System } from "../entities/System";
+import { loggerFactory } from "../logger";
 import { GroupRepository } from "../repositories/GroupRepository";
 import { RoleRepository } from "../repositories/RoleRepository";
 import { SystemRepository } from "../repositories/SystemRepository";
 import { SystemConstants } from "./SystemConstants";
-import { loggerFactory } from "../logger";
 
 class SystemCreatedRole {
     systemAdministratorRole: Role;
@@ -105,7 +104,7 @@ export class SystemConfig {
     private async alreadyConfigured(): Promise<boolean> {
         const system = await SystemRepository.findById(1);
         if (system) {
-            this.logger.info(`System configured. Version ${system.get('version')}`);
+            this.logger.info(`System configured. Version ${system.version}`);
             return true;
         }
         return false;

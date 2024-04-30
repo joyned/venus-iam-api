@@ -3,19 +3,20 @@ import { v4 } from "uuid";
 import { Role } from "../entities/Role";
 import { RoleService } from "../services/RoleService";
 import { mapRolesToDTO, mapRoleToDTO } from "./mapper";
+import { authenticationMiddleware } from "../middleware/AuthenticationMiddleware";
 
 const roleController = Router();
 const service = new RoleService();
 
-roleController.get('/', async (req, res) => {
+roleController.get('/', authenticationMiddleware(['SYSTEM_ADMIN', 'SYSTEM_VIEWER']), async (req, res) => {
     return res.json(mapRolesToDTO(await service.findAll()));
 });
 
-roleController.get('/:roleId', async (req, res) => {
+roleController.get('/:roleId', authenticationMiddleware(['SYSTEM_ADMIN', 'SYSTEM_VIEWER']), async (req, res) => {
     return res.json(mapRoleToDTO(await service.findById(req.params.roleId)));
 });
 
-roleController.post('/', async (req, res) => {
+roleController.post('/', authenticationMiddleware(['SYSTEM_ADMIN']), async (req, res) => {
     let role: Role = new Role();
 
     if (req.body.id) {
@@ -34,7 +35,7 @@ roleController.post('/', async (req, res) => {
     }
 })
 
-roleController.delete('/:roleId', async (req, res) => {
+roleController.delete('/:roleId', authenticationMiddleware(['SYSTEM_ADMIN']), async (req, res) => {
     try {
         const result = await service.delete(req.params.roleId);
         if (result) {

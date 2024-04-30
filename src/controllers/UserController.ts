@@ -1,25 +1,25 @@
-import { Router } from "express";
-import { UserService } from "../services/UserService";
-import { mapUsersToDTO, mapUserToDTO } from "./mapper";
+import { Router } from 'express';
+import { UserService } from '../services/UserService';
+import { mapUsersToDTO, mapUserToDTO } from './mapper';
+import { authenticationMiddleware } from '../middleware/AuthenticationMiddleware';
 
 const userController = Router();
 const service = new UserService();
 
-userController.get('/', async (req, res) => {
-    return res.json(mapUsersToDTO(await service.findAll()));
+userController.get('/', authenticationMiddleware(['SYSTEM_ADMIN', 'SYSTEM_VIEWER']),  async (req, res) => {
+  return res.json(mapUsersToDTO(await service.findAll()));
 });
 
-userController.get('/:id', async (req, res) => {
-    return res.json(mapUserToDTO(await service.findById(req.params.id)));
+userController.get('/:id', authenticationMiddleware(['SYSTEM_ADMIN', 'SYSTEM_VIEWER']), async (req, res) => {
+  return res.json(mapUserToDTO(await service.findById(req.params.id)));
 });
 
-userController.post('/', async (req, res) => {
-    return res.json(await service.persist(req.body))
+userController.post('/', authenticationMiddleware(['SYSTEM_ADMIN']), async (req, res) => {
+  return res.json(await service.persist(req.body));
 });
 
-userController.delete('/:id', async (req, res) => {
-    return res.json(await service.delete(req.params.id))
+userController.delete('/:id', authenticationMiddleware(['SYSTEM_ADMIN']), async (req, res) => {
+  return res.json(await service.delete(req.params.id));
 });
-
 
 export default userController;
