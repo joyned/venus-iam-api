@@ -8,6 +8,7 @@ import { beginTransaction, commitTransation, rollbackTransation } from "../repos
 import { GroupRepository } from "../repositories/GroupRepository";
 import { RoleRepository } from "../repositories/RoleRepository";
 import { SystemRepository } from "../repositories/SystemRepository";
+import { generatePassword } from "../utils/Utils";
 import { SystemConstants } from "./SystemConstants";
 
 class SystemCreatedRole {
@@ -108,7 +109,7 @@ export class SystemConfig {
     }
 
     private async createInitialAuthSettings() {
-        const authSettings: AuthSettings = new AuthSettings({ tokenDurability: 3600, generateRefreshToken: true });
+        const authSettings: AuthSettings = new AuthSettings({ token_durability: 3600, generate_refresh_token: true, jwt_secret: generatePassword(50) });
         const result = await AuthSettingsRepository.find();
         if (!result) {
             this.logger.info(`Not found any initial configuration for Auth Settings, creating default ${JSON.stringify(authSettings)}`)
