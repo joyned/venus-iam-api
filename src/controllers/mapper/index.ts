@@ -1,9 +1,11 @@
+import { AuthSettings } from '../../entities/AuthSettings';
 import { Client } from '../../entities/Client';
 import { ClientAllowedUrl } from '../../entities/ClientAllowedUrl';
 import { Group } from '../../entities/Group';
 import { Role } from '../../entities/Role';
 import { User } from '../../entities/User';
 import { AuthenticationDTO } from '../dto/AuthenticationDTO';
+import { AuthSettingsDTO } from '../dto/AuthSettingsDTO';
 import { ClientAllowedUrlDTO } from '../dto/ClientAllowedUrlDTO';
 import { ClientDTO } from '../dto/ClientDTO';
 import { GroupDTO } from '../dto/GroupDTO';
@@ -16,6 +18,13 @@ export function mapAuthenticationToDTO(user: User, token: string): Authenticatio
         token: token
     }
 };
+
+export function mapAuthSettingsToDTO(authSettings: AuthSettings): AuthSettingsDTO {
+    return {
+        generateRefreshToken: authSettings.generateRefreshToken,
+        tokenDurability: authSettings.tokenDurability
+    }
+}
 
 export function mapClientToDTO(client: Client): ClientDTO {
     return {

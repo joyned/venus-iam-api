@@ -1,7 +1,10 @@
+import { AuthSettings } from "../entities/AuthSettings";
 import { Group } from "../entities/Group";
 import { Role } from "../entities/Role";
 import { System } from "../entities/System";
 import { loggerFactory } from "../logger";
+import { AuthSettingsRepository } from "../repositories/AuthSettingsRepository";
+import { beginTransaction, commitTransation, rollbackTransation } from "../repositories/BaseRepository";
 import { GroupRepository } from "../repositories/GroupRepository";
 import { RoleRepository } from "../repositories/RoleRepository";
 import { SystemRepository } from "../repositories/SystemRepository";
@@ -29,15 +32,18 @@ export class SystemConfig {
     async start() {
         try {
             if (!await this.alreadyConfigured()) {
+                await beginTransaction();
                 this.logger.info(`Configuring System. Please wait...`);
                 const roles = await this.createSystemRoles();
                 await this.createGroups(roles);
                 await this.createSystemConfigs();
+                await this.createInitialAuthSettings();
                 this.logger.info(`System configured. Version ${this.systemVersion}`);
+                await commitTransation();
             }
         } catch (error) {
+            await rollbackTransation();
             this.logger.error(`Error occured while starting server. ${error}`);
-
         }
     }
 
@@ -99,6 +105,15 @@ export class SystemConfig {
         system.version = this.systemVersion;
 
         await SystemRepository.persist(system);
+    }
+
+    private async createInitialAuthSettings() {
+        const authSettings: AuthSettings = new AuthSettings({ tokenDurability: 3600, generateRefreshToken: true });
+        const result = await AuthSettingsRepository.find();
+        if (!result) {
+            this.logger.info(`Not found any initial configuration for Auth Settings, creating default ${JSON.stringify(authSettings)}`)
+            await AuthSettingsRepository.save(authSettings);
+        }
     }
 
     private async alreadyConfigured(): Promise<boolean> {

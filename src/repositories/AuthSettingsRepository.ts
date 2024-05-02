@@ -1,0 +1,31 @@
+import { AuthSettings } from "../entities/AuthSettings";
+import { executeQuery } from "./BaseRepository";
+
+const FIND = `SELECT token_durability, generate_refresh_token FROM venus.auth_settings`;
+const INSERT = `INSERT INTO venus.auth_settings(token_durability, generate_refresh_token) VALUES ($1, $2)`
+const UPDATE = `UPDATE venus.auth_settings SET token_durability=$1, generate_refresh_token=$2`
+
+export class AuthSettingsRepository {
+    static async find() {
+        const result = await executeQuery(FIND);
+        return result.rows[0];
+    }
+
+    static async update(authSettings: AuthSettings) {
+        const result = await executeQuery(UPDATE, [authSettings.tokenDurability, authSettings.generateRefreshToken]);
+        if (result.rowCount == 1) {
+            return authSettings;
+        }
+
+        return undefined;
+    }
+
+    static async save(authSettings: AuthSettings) {
+        const result = await executeQuery(INSERT, [authSettings.tokenDurability, authSettings.generateRefreshToken]);
+        if (result.rowCount == 1) {
+            return authSettings;
+        }
+
+        return undefined;
+    }
+}

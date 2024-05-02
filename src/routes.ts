@@ -5,6 +5,7 @@ import internalAuthenticationController from './controllers/InternalAuthenticati
 import roleController from './controllers/RoleController';
 import systemController from './controllers/SystemController';
 import userController from './controllers/UserController';
+import authSettingsController from './controllers/AuthSettingsController';
 
 const routes = Router();
 
@@ -19,5 +20,6 @@ routes.use(
   `${basePath}/internalAuthentication`,
   internalAuthenticationController
 );
+routes.use(`${basePath}/authSettings`, authSettingsController);
 
 export default routes;
