@@ -3,7 +3,7 @@ import { Client } from "../entities/Client";
 import { executeQuery } from "./BaseRepository";
 
 const FIND = `SELECT id, "name", url, client_secret, image, created_at FROM venus.client`
-const INSERT = `INSERT INTO venus.client (id, "name", url, client_secret, image, created_at) VALUES($1, $2, $3, $4, CURRENT_TIMESTAMP)`;
+const INSERT = `INSERT INTO venus.client (id, "name", url, client_secret, image, created_at) VALUES($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`;
 const UPDATE = 'UPDATE venus.client SET "name"=$2, url=$3, image=$4 WHERE id=$1';
 const DELETE = `DELETE FROM venus."client" WHERE id=$1`
 
