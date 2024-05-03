@@ -4,9 +4,14 @@ import { Role } from '../entities/Role';
 import { RoleService } from '../services/RoleService';
 import { mapRolesToDTO, mapRoleToDTO } from './mapper';
 import { authenticationMiddleware } from '../middleware/AuthenticationMiddleware';
+import { GroupRoleRepository } from '../repositories/GroupRoleRepository';
+import { RoleRepository } from '../repositories/RoleRepository';
 
 const roleController = Router();
-const service = new RoleService();
+const service = new RoleService(
+  new RoleRepository(),
+  new GroupRoleRepository()
+);
 
 roleController.get(
   '/',

@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import { InvalidPasswordError } from '../exceptions/InvalidPasswordError';
 import { AuthenticationService } from '../services/AuthenticationService';
+import { UserRepository } from '../repositories/UserRepository';
+import { RoleRepository } from '../repositories/RoleRepository';
 
 const internalAuthenticationController = Router();
-const service = new AuthenticationService();
+const service = new AuthenticationService(
+  new UserRepository(),
+  new RoleRepository()
+);
 
 internalAuthenticationController.post('/login', async (req, res) => {
   const { email, password } = req.body;
