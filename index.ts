@@ -11,9 +11,14 @@ const systemConfig = new SystemConfig();
 
 systemConfig.start().then(() => {
   const app = express();
+
+  const requestMaxSize = process.env.REQUEST_MAX_SIZE || '5mb';
+
+  logger.info(`Express configured with max request size of ${requestMaxSize}`);
+
   app.use(errorHandler);
   app.use(cors());
-  app.use(express.json({ limit: '5mb' }));
+  app.use(express.json({ limit: requestMaxSize }));
 
   app.use(routes);
 
