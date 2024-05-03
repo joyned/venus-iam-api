@@ -3,6 +3,7 @@ import { Client } from '../../entities/Client';
 import { ClientAllowedUrl } from '../../entities/ClientAllowedUrl';
 import { Group } from '../../entities/Group';
 import { Role } from '../../entities/Role';
+import { TenantSettings } from '../../entities/TenantSettings';
 import { User } from '../../entities/User';
 import { AuthSettingsDTO } from '../dto/AuthSettingsDTO';
 import { AuthenticationDTO } from '../dto/AuthenticationDTO';
@@ -11,6 +12,16 @@ import { ClientDTO } from '../dto/ClientDTO';
 import { GroupDTO } from '../dto/GroupDTO';
 import { RoleDTO } from '../dto/RoleDTO';
 import { UserDTO } from '../dto/UserDTO';
+
+export function mapTenantSettingsToDTO(tenantSettings: TenantSettings): TenantSettings {
+    return {
+        name: tenantSettings.name,
+        primaryColor: tenantSettings.primaryColor,
+        secondColor: tenantSettings.secondColor,
+        textColor: tenantSettings.textColor,
+        image: tenantSettings.image
+    }
+}
 
 export function mapAuthenticationToDTO(user: User, token: string): AuthenticationDTO {
     return {

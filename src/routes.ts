@@ -7,6 +7,7 @@ import systemController from './controllers/SystemController';
 import userController from './controllers/UserController';
 import authSettingsController from './controllers/AuthSettingsController';
 import iamAuthenticationController from './controllers/IAMAuthenticationController';
+import tenantSettingsController from './controllers/TenantSettingsController';
 
 const routes = Router();
 
@@ -23,5 +24,6 @@ routes.use(
 );
 routes.use(`${basePath}/authSettings`, authSettingsController);
 routes.use(`${basePath}/iamAuthentication`, iamAuthenticationController);
+routes.use(`${basePath}/tenantSettings`, tenantSettingsController);
 
 export default routes;
