@@ -1,13 +1,13 @@
-import { mock, MockProxy } from 'jest-mock-extended';
-import { Role } from '../../src/entities/Role';
-import { User } from '../../src/entities/User';
-import { InvalidPasswordError } from '../../src/exceptions/InvalidPasswordError';
-import { AuthSettingsRepository } from '../../src/repositories/AuthSettingsRepository';
-import { RoleRepository } from '../../src/repositories/RoleRepository';
-import { UserRepository } from '../../src/repositories/UserRepository';
-import { IAMAuthenticationService } from '../../src/services/IAMAuthenticationService';
+import { mock, MockProxy } from "jest-mock-extended";
+import { Role } from "../../src/entities/Role";
+import { User } from "../../src/entities/User";
+import { InvalidPasswordError } from "../../src/exceptions/InvalidPasswordError";
+import { AuthSettingsRepository } from "../../src/repositories/AuthSettingsRepository";
+import { RoleRepository } from "../../src/repositories/RoleRepository";
+import { UserRepository } from "../../src/repositories/UserRepository";
+import { IAMAuthenticationService } from "../../src/services/IAMAuthenticationService";
 
-describe('IAMAuthenticationService', () => {
+describe("IAMAuthenticationService", () => {
   let iamAuthenticationService: IAMAuthenticationService;
   let userRepositoryMock: MockProxy<UserRepository>;
   let roleRepositoryMock: MockProxy<RoleRepository>;
@@ -20,7 +20,7 @@ describe('IAMAuthenticationService', () => {
     iamAuthenticationService = new IAMAuthenticationService(
       userRepositoryMock,
       roleRepositoryMock,
-      authSettingsRepositoryMock
+      authSettingsRepositoryMock,
     );
   });
 
@@ -28,19 +28,19 @@ describe('IAMAuthenticationService', () => {
     jest.clearAllMocks();
   });
 
-  it('should return a token when login is successful', async () => {
+  it("should return a token when login is successful", async () => {
     const user: User = {
-      id: '1',
-      name: 'Test User',
-      email: 'test@example.com',
-      password: 'password',
+      id: "1",
+      name: "Test User",
+      email: "test@example.com",
+      password: "password",
       isBlocked: false,
       createdAt: new Date(),
       groups: [],
     };
-    const roles: Role[] = [{ id: '1', name: 'admin', createdAt: new Date() }];
+    const roles: Role[] = [{ id: "1", name: "admin", createdAt: new Date() }];
     const authSettings = {
-      jwt_secret: 'secret',
+      jwt_secret: "secret",
       token_durability: 3600,
       generate_refresh_token: false,
     };
@@ -51,21 +51,21 @@ describe('IAMAuthenticationService', () => {
 
     const result = await iamAuthenticationService.doLogin(
       user.email,
-      user.password
+      user.password,
     );
 
     expect(userRepositoryMock.findByEmail).toHaveBeenCalledWith(user.email);
     expect(roleRepositoryMock.findRolesByUserId).toHaveBeenCalledWith(user.id);
     expect(authSettingsRepositoryMock.find).toHaveBeenCalled();
-    expect(result).toHaveProperty('token');
+    expect(result).toHaveProperty("token");
   });
 
-  it('should throw an error when password is incorrect', async () => {
+  it("should throw an error when password is incorrect", async () => {
     const user: User = {
-      id: '1',
-      name: 'Test User',
-      email: 'test@example.com',
-      password: 'password',
+      id: "1",
+      name: "Test User",
+      email: "test@example.com",
+      password: "password",
       isBlocked: false,
       createdAt: new Date(),
       groups: [],
@@ -74,23 +74,23 @@ describe('IAMAuthenticationService', () => {
     userRepositoryMock.findByEmail.mockResolvedValue(user);
 
     await expect(
-      iamAuthenticationService.doLogin(user.email, 'wrongpassword')
+      iamAuthenticationService.doLogin(user.email, "wrongpassword"),
     ).rejects.toThrow(
-      new InvalidPasswordError(`Invalid e-mail or password for ${user.email}.`)
+      new InvalidPasswordError(`Invalid e-mail or password for ${user.email}.`),
     );
   });
 
-  it('should return roles when findRolesByUserId is called', async () => {
+  it("should return roles when findRolesByUserId is called", async () => {
     const roles: Role[] = [
-      { id: '1', name: 'admin', createdAt: new Date() },
-      { id: '2', name: 'user', createdAt: new Date() },
+      { id: "1", name: "admin", createdAt: new Date() },
+      { id: "2", name: "user", createdAt: new Date() },
     ];
 
     roleRepositoryMock.findRolesByUserId.mockResolvedValue(roles);
 
-    const result = await iamAuthenticationService.findRolesByUserId('1');
+    const result = await iamAuthenticationService.findRolesByUserId("1");
 
-    expect(roleRepositoryMock.findRolesByUserId).toHaveBeenCalledWith('1');
+    expect(roleRepositoryMock.findRolesByUserId).toHaveBeenCalledWith("1");
     expect(result).toEqual(roles.map((role) => role.name));
   });
 });

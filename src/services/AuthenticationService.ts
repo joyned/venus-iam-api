@@ -1,10 +1,10 @@
-import { AuthenticationDTO } from '../controllers/dto/AuthenticationDTO';
-import { mapAuthenticationToDTO, mapRolesToDTO } from '../controllers/mapper';
-import { Role } from '../entities/Role';
-import { InvalidPasswordError } from '../exceptions/InvalidPasswordError';
-import { RoleRepository } from '../repositories/RoleRepository';
-import { UserRepository } from '../repositories/UserRepository';
-import Jwt from 'jsonwebtoken';
+import { AuthenticationDTO } from "../controllers/dto/AuthenticationDTO";
+import { mapAuthenticationToDTO, mapRolesToDTO } from "../controllers/mapper";
+import { Role } from "../entities/Role";
+import { InvalidPasswordError } from "../exceptions/InvalidPasswordError";
+import { RoleRepository } from "../repositories/RoleRepository";
+import { UserRepository } from "../repositories/UserRepository";
+import Jwt from "jsonwebtoken";
 
 export class AuthenticationService {
   userRepository: UserRepository;
@@ -17,7 +17,7 @@ export class AuthenticationService {
 
   async login(
     email: string,
-    password: string
+    password: string,
   ): Promise<AuthenticationDTO | undefined> {
     const user = await this.userRepository.findByEmail(email);
 
@@ -40,10 +40,10 @@ export class AuthenticationService {
           },
           roles: roles,
         },
-        process.env.JWT_SECRET || 'secret',
+        process.env.JWT_SECRET || "secret",
         {
-          expiresIn: '1h',
-        }
+          expiresIn: "1h",
+        },
       );
 
       return mapAuthenticationToDTO(user, token);
@@ -57,7 +57,7 @@ export class AuthenticationService {
 
   verifyToken(token: string): boolean {
     try {
-      Jwt.verify(token, process.env.JWT_SECRET || 'secret');
+      Jwt.verify(token, process.env.JWT_SECRET || "secret");
       return true;
     } catch (error) {
       return false;

@@ -1,5 +1,5 @@
-import { TenantSettings } from '../entities/TenantSettings';
-import { TenantSettingsRepository } from '../repositories/TenantSettingsRepository';
+import { TenantSettings } from "../entities/TenantSettings";
+import { TenantSettingsRepository } from "../repositories/TenantSettingsRepository";
 
 export class TenantSettingsService {
   tenantSettingsRepository: TenantSettingsRepository;
@@ -14,23 +14,23 @@ export class TenantSettingsService {
 
   async persist(tenantSettings: TenantSettings): Promise<TenantSettings> {
     if (!tenantSettings.name) {
-      throw new Error('Name is required');
+      throw new Error("Name is required");
     }
 
     if (!tenantSettings.primaryColor) {
-      tenantSettings.primaryColor = '#111827';
+      tenantSettings.primaryColor = "#111827";
     }
 
     if (!tenantSettings.secondColor) {
-      tenantSettings.secondColor = '#1f2937';
+      tenantSettings.secondColor = "#1f2937";
     }
 
     if (!tenantSettings.textColor) {
-      tenantSettings.textColor = '#f9fafb';
+      tenantSettings.textColor = "#f9fafb";
     }
 
     return new TenantSettings(
-      await this.tenantSettingsRepository.persist(tenantSettings)
+      await this.tenantSettingsRepository.persist(tenantSettings),
     );
   }
 

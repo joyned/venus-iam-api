@@ -1,4 +1,4 @@
 export interface ClientAllowedUrlDTO {
-    clientId: string;
-    url: string;
+  clientId: string;
+  url: string;
 }

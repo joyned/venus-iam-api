@@ -1,9 +1,9 @@
-import { mock, MockProxy } from 'jest-mock-extended';
-import { RoleService } from '../../src/services/RoleService';
-import { RoleRepository } from '../../src/repositories/RoleRepository';
-import { GroupRoleRepository } from '../../src/repositories/GroupRoleRepository';
+import { mock, MockProxy } from "jest-mock-extended";
+import { RoleService } from "../../src/services/RoleService";
+import { RoleRepository } from "../../src/repositories/RoleRepository";
+import { GroupRoleRepository } from "../../src/repositories/GroupRoleRepository";
 
-describe('RoleService', () => {
+describe("RoleService", () => {
   let roleService: RoleService;
   let roleRepositoryMock: MockProxy<RoleRepository>;
   let groupRoleRepositoryMock: MockProxy<GroupRoleRepository>;
@@ -18,9 +18,8 @@ describe('RoleService', () => {
     jest.clearAllMocks();
   });
 
-  it('should be created with the correct repository', () => {
+  it("should be created with the correct repository", () => {
     expect(roleService).toBeTruthy();
     expect(roleService).toBeInstanceOf(RoleService);
   });
-
 });

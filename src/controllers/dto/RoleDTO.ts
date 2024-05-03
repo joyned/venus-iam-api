@@ -1,5 +1,5 @@
 export interface RoleDTO {
-    id: string;
-    name: string;
-    createdAt: Date;
+  id: string;
+  name: string;
+  createdAt: Date;
 }

@@ -1,13 +1,13 @@
-import { v4 } from 'uuid';
-import { Group } from '../entities/Group';
-import { Role } from '../entities/Role';
-import { NotEditableItem } from '../exceptions/NotEditableItem';
-import { GroupRepository } from '../repositories/GroupRepository';
-import { GroupRoleRepository } from '../repositories/GroupRoleRepository';
-import { RoleRepository } from '../repositories/RoleRepository';
-import { TransactionRepository } from '../repositories/TransactionRepository';
-import { UserGroupRepository } from '../repositories/UserRoleRepository';
-import { SystemConstants } from '../systemConfig/SystemConstants';
+import { v4 } from "uuid";
+import { Group } from "../entities/Group";
+import { Role } from "../entities/Role";
+import { NotEditableItem } from "../exceptions/NotEditableItem";
+import { GroupRepository } from "../repositories/GroupRepository";
+import { GroupRoleRepository } from "../repositories/GroupRoleRepository";
+import { RoleRepository } from "../repositories/RoleRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
+import { UserGroupRepository } from "../repositories/UserRoleRepository";
+import { SystemConstants } from "../systemConfig/SystemConstants";
 
 export class GroupService {
   groupRepository: GroupRepository;
@@ -19,7 +19,7 @@ export class GroupService {
     groupRepository: GroupRepository,
     roleRepository: RoleRepository,
     groupRoleRepository: GroupRoleRepository,
-    userGroupRepository: UserGroupRepository
+    userGroupRepository: UserGroupRepository,
   ) {
     this.groupRepository = groupRepository;
     this.roleRepository = roleRepository;

@@ -1,19 +1,19 @@
-import { loggerFactory } from '../logger';
+import { loggerFactory } from "../logger";
 import {
   beginTransaction,
   commitTransation,
   executeQuery,
   rollbackTransation,
-} from '../repositories/BaseRepository';
-import { GroupRepository } from '../repositories/GroupRepository';
-import { SystemRepository } from '../repositories/SystemRepository';
-import { generatePassword } from '../utils/Utils';
-import { SystemConstants } from './SystemConstants';
+} from "../repositories/BaseRepository";
+import { GroupRepository } from "../repositories/GroupRepository";
+import { SystemRepository } from "../repositories/SystemRepository";
+import { generatePassword } from "../utils/Utils";
+import { SystemConstants } from "./SystemConstants";
 
-import { version } from '../../package.json';
-import { UserRepository } from '../repositories/UserRepository';
-import { UserGroupRepository } from '../repositories/UserRoleRepository';
-import { UserService } from '../services/UserService';
+import { version } from "../../package.json";
+import { UserRepository } from "../repositories/UserRepository";
+import { UserGroupRepository } from "../repositories/UserRoleRepository";
+import { UserService } from "../services/UserService";
 
 export class SystemConfig {
   private readonly logger = loggerFactory(__filename);
@@ -46,7 +46,7 @@ export class SystemConfig {
           SystemConstants.systemViewerGroupName,
           this.systemVersion,
           generatePassword(50),
-          SystemConstants.defaultTenantImage
+          SystemConstants.defaultTenantImage,
         );
 
         this.logger.info(`System configured. Version ${this.systemVersion}`);
@@ -63,12 +63,12 @@ export class SystemConfig {
       const userService = new UserService(
         new UserRepository(),
         new UserGroupRepository(),
-        new GroupRepository()
+        new GroupRepository(),
       );
       const adminUser: any = {
-        name: 'Admin',
-        email: process.env.ADMIN_USER_EMAIL || 'admin@venus.com',
-        password: process.env.ADMIN_USER_PASSWORD || '123mudar',
+        name: "Admin",
+        email: process.env.ADMIN_USER_EMAIL || "admin@venus.com",
+        password: process.env.ADMIN_USER_PASSWORD || "123mudar",
         groups: await this.groupRepository.findAll(),
       };
 
@@ -98,12 +98,12 @@ export class SystemConfig {
     groupName2: string,
     systemVersion: string,
     jwtSecret: string,
-    tenantImage: string
+    tenantImage: string,
   ): Promise<void> {
     // Insert roles
     await executeQuery(
       `INSERT INTO venus.role (id, name, created_at) VALUES (uuid_generate_v4(), $1, NOW()), (uuid_generate_v4(), $2, NOW());`,
-      [role1, role2]
+      [role1, role2],
     );
 
     // Get IDs of the inserted roles
@@ -124,11 +124,11 @@ export class SystemConfig {
     // Get IDs of the inserted groups
     const adminGroupId = await this.getSingleId(
       `SELECT id FROM venus.group WHERE name = $1;`,
-      [groupName1]
+      [groupName1],
     );
     const viewerGroupId = await this.getSingleId(
       `SELECT id FROM venus.group WHERE name = $1;`,
-      [groupName2]
+      [groupName2],
     );
 
     // Insert group roles
@@ -147,25 +147,25 @@ export class SystemConfig {
     // Insert system config
     await executeQuery(
       `INSERT INTO venus.system (id, version) VALUES (1, $1);`,
-      [systemVersion]
+      [systemVersion],
     );
 
     // Insert initial auth settings
     await executeQuery(
       `INSERT INTO venus.auth_settings (token_durability, generate_refresh_token, jwt_secret) VALUES (3600, true, $1);`,
-      [jwtSecret]
+      [jwtSecret],
     );
 
     // Insert initial tenant settings
     await executeQuery(
       `INSERT INTO venus.tenant_settings (name, primary_color, second_color, text_color, default_image) VALUES ('Default', '#111827', '#1f2937', '#f9fafb', $1);`,
-      [tenantImage]
+      [tenantImage],
     );
   }
 
   private async getSingleId(
     queryString: string,
-    params: any[]
+    params: any[],
   ): Promise<number> {
     const result: any = await executeQuery(queryString, params);
     return result.rows[0].id;

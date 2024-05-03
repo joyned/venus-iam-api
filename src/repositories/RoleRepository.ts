@@ -1,6 +1,6 @@
-import { v4 } from 'uuid';
-import { Role } from '../entities/Role';
-import { executeQuery } from './BaseRepository';
+import { v4 } from "uuid";
+import { Role } from "../entities/Role";
+import { executeQuery } from "./BaseRepository";
 
 const FIND = 'SELECT id, "name", created_at FROM venus."role"';
 const FIND_ROLE_BY_GROUP_ID = `select r.* from venus."role" r join venus.group_role gr on r.id = gr.role_id and gr.group_id = $1`;

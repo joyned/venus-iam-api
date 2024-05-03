@@ -1,7 +1,7 @@
-import { pool } from '../database';
-import { loggerFactory } from '../logger';
+import { pool } from "../database";
+import { loggerFactory } from "../logger";
 
-const logger = loggerFactory('BaseRepository');
+const logger = loggerFactory("BaseRepository");
 
 const executeQuery = async (query: string, params: any[] = []) => {
   try {
@@ -14,18 +14,18 @@ const executeQuery = async (query: string, params: any[] = []) => {
 };
 
 const beginTransaction = async () => {
-  logger.info(`Begining transaction...`)
-  return await pool.query('BEGIN');
-}
+  logger.info(`Begining transaction...`);
+  return await pool.query("BEGIN");
+};
 
 const rollbackTransation = async () => {
-  logger.info(`Rollbacking transaction...`)
-  return await pool.query('ROLLBACK');
-}
+  logger.info(`Rollbacking transaction...`);
+  return await pool.query("ROLLBACK");
+};
 
 const commitTransation = async () => {
-  logger.info(`Commiting transaction...`)
-  return await pool.query('COMMIT');
-}
+  logger.info(`Commiting transaction...`);
+  return await pool.query("COMMIT");
+};
 
 export { executeQuery, beginTransaction, rollbackTransation, commitTransation };

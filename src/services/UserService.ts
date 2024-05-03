@@ -1,10 +1,10 @@
-import { v4 } from 'uuid';
-import { User } from '../entities/User';
-import { UserRepository } from '../repositories/UserRepository';
-import { UserGroupRepository } from '../repositories/UserRoleRepository';
-import { Group } from '../entities/Group';
-import { GroupRepository } from '../repositories/GroupRepository';
-import { TransactionRepository } from '../repositories/TransactionRepository';
+import { v4 } from "uuid";
+import { User } from "../entities/User";
+import { UserRepository } from "../repositories/UserRepository";
+import { UserGroupRepository } from "../repositories/UserRoleRepository";
+import { Group } from "../entities/Group";
+import { GroupRepository } from "../repositories/GroupRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
 
 export class UserService {
   userRepository: UserRepository;
@@ -14,7 +14,7 @@ export class UserService {
   constructor(
     userRepository: UserRepository,
     userGroupRepository: UserGroupRepository,
-    groupRepository: GroupRepository
+    groupRepository: GroupRepository,
   ) {
     this.userRepository = userRepository;
     this.userGroupRepository = userGroupRepository;
@@ -29,7 +29,7 @@ export class UserService {
     const user: User = await this.userRepository.findByEmail(email);
     if (user) {
       const groups: Group[] = await this.groupRepository.findGroupsByUserId(
-        user.id
+        user.id,
       );
       user.groups = [];
       groups.forEach((group) => user.groups.push(group));

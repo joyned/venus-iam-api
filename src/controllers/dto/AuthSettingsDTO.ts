@@ -1,5 +1,4 @@
-
 export interface AuthSettingsDTO {
-    tokenDurability: number;
-    generateRefreshToken: boolean;
+  tokenDurability: number;
+  generateRefreshToken: boolean;
 }

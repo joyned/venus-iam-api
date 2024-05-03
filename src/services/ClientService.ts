@@ -1,12 +1,12 @@
-import { v4 } from 'uuid';
-import { Client } from '../entities/Client';
-import { ClientAllowedUrl } from '../entities/ClientAllowedUrl';
-import { ClientAllowedUrlRepository } from '../repositories/ClientAllowedUrlRepository';
-import { ClientRepository } from '../repositories/ClientRepository';
-import { TransactionRepository } from '../repositories/TransactionRepository';
-import { InvalidClientSecretError } from '../exceptions/InvalidClientSecretError';
-import { InvalidClientIdError } from '../exceptions/InvalidClientIdError';
-import { InvalidRedirectUrlError } from '../exceptions/InvalidRedirectUrlError';
+import { v4 } from "uuid";
+import { Client } from "../entities/Client";
+import { ClientAllowedUrl } from "../entities/ClientAllowedUrl";
+import { ClientAllowedUrlRepository } from "../repositories/ClientAllowedUrlRepository";
+import { ClientRepository } from "../repositories/ClientRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
+import { InvalidClientSecretError } from "../exceptions/InvalidClientSecretError";
+import { InvalidClientIdError } from "../exceptions/InvalidClientIdError";
+import { InvalidRedirectUrlError } from "../exceptions/InvalidRedirectUrlError";
 
 export class ClientService {
   clientRepository: ClientRepository;
@@ -14,7 +14,7 @@ export class ClientService {
 
   constructor(
     clientRepository: ClientRepository,
-    clientAllowedUrlRepository: ClientAllowedUrlRepository
+    clientAllowedUrlRepository: ClientAllowedUrlRepository,
   ) {
     this.clientRepository = clientRepository;
     this.clientAllowedUrlRepository = clientAllowedUrlRepository;
@@ -44,7 +44,7 @@ export class ClientService {
     if (createdClient) {
       await this.clientAllowedUrlRepository.persist(
         client.id,
-        client.allowedUrls
+        client.allowedUrls,
       );
       return createdClient.id;
     }
@@ -64,7 +64,7 @@ export class ClientService {
   async checkCredentials(
     clientId: string,
     clientSecret: string,
-    redirectUrl: string
+    redirectUrl: string,
   ): Promise<boolean> {
     const clientAllowedUrls =
       await this.clientAllowedUrlRepository.findByClientId(clientId);
@@ -78,13 +78,13 @@ export class ClientService {
 
     if (client.clientSecret !== clientSecret) {
       throw new InvalidClientSecretError(
-        `Invalid client secret for client ${clientId}`
+        `Invalid client secret for client ${clientId}`,
       );
     }
 
     if (!urls.includes(redirectUrl)) {
       throw new InvalidRedirectUrlError(
-        `Redirect URL ${redirectUrl} is not allowed for client ${clientId}`
+        `Redirect URL ${redirectUrl} is not allowed for client ${clientId}`,
       );
     }
 

@@ -1,10 +1,10 @@
-import Jwt from 'jsonwebtoken';
-import { Role } from '../entities/Role';
-import { AuthSettingsRepository } from '../repositories/AuthSettingsRepository';
-import { RoleRepository } from '../repositories/RoleRepository';
-import { UserRepository } from '../repositories/UserRepository';
-import { AuthSettings } from '../entities/AuthSettings';
-import { InvalidPasswordError } from '../exceptions/InvalidPasswordError';
+import Jwt from "jsonwebtoken";
+import { Role } from "../entities/Role";
+import { AuthSettingsRepository } from "../repositories/AuthSettingsRepository";
+import { RoleRepository } from "../repositories/RoleRepository";
+import { UserRepository } from "../repositories/UserRepository";
+import { AuthSettings } from "../entities/AuthSettings";
+import { InvalidPasswordError } from "../exceptions/InvalidPasswordError";
 
 export class IAMAuthenticationService {
   userRepository: UserRepository;
@@ -14,7 +14,7 @@ export class IAMAuthenticationService {
   constructor(
     userRepository: UserRepository,
     roleRepository: RoleRepository,
-    authSettingsRepository: AuthSettingsRepository
+    authSettingsRepository: AuthSettingsRepository,
   ) {
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
@@ -25,7 +25,7 @@ export class IAMAuthenticationService {
     const user = await this.userRepository.findByEmail(email);
     if (user && user.password === password) {
       const authSettings: AuthSettings = new AuthSettings(
-        await this.authSettingsRepository.find()
+        await this.authSettingsRepository.find(),
       );
       const roles = await this.findRolesByUserId(user.id);
 
@@ -39,16 +39,16 @@ export class IAMAuthenticationService {
           },
           roles: roles,
         },
-        authSettings.jwtSecret || 'secret',
+        authSettings.jwtSecret || "secret",
         {
           expiresIn: authSettings.tokenDurability,
-        }
+        },
       );
 
       return { token: token };
     } else {
       throw new InvalidPasswordError(
-        `Invalid e-mail or password for ${email}.`
+        `Invalid e-mail or password for ${email}.`,
       );
     }
   }

@@ -1,6 +1,6 @@
-import { v4 } from 'uuid';
-import { User } from '../entities/User';
-import { executeQuery } from './BaseRepository';
+import { v4 } from "uuid";
+import { User } from "../entities/User";
+import { executeQuery } from "./BaseRepository";
 
 const FIND = `SELECT id, "name", email, "password", created_at, is_blocked FROM venus."user"`;
 const INSERT =

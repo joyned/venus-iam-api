@@ -1,5 +1,5 @@
-import { AuthSettings } from '../entities/AuthSettings';
-import { AuthSettingsRepository } from '../repositories/AuthSettingsRepository';
+import { AuthSettings } from "../entities/AuthSettings";
+import { AuthSettingsRepository } from "../repositories/AuthSettingsRepository";
 
 export class AuthSettingsService {
   authSettingsRepository: AuthSettingsRepository;
@@ -18,11 +18,11 @@ export class AuthSettingsService {
       !authSettings.tokenDurability
     ) {
       throw new Error(
-        `Failed to update Auth settings. Null parameters are not allowed.`
+        `Failed to update Auth settings. Null parameters are not allowed.`,
       );
     }
     return new AuthSettings(
-      await this.authSettingsRepository.update(authSettings)
+      await this.authSettingsRepository.update(authSettings),
     );
   }
 }

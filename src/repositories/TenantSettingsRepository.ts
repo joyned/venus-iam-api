@@ -1,5 +1,5 @@
-import { TenantSettings } from '../entities/TenantSettings';
-import { executeQuery } from './BaseRepository';
+import { TenantSettings } from "../entities/TenantSettings";
+import { executeQuery } from "./BaseRepository";
 
 const FIND = `SELECT * FROM venus.tenant_settings`;
 const INSERT = `INSERT INTO venus.tenant_settings (name, primary_color, second_color, text_color, default_image) VALUES ($1, $2, $3, $4, $5)`;

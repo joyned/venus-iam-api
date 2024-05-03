@@ -1,9 +1,9 @@
-import { Role } from '../entities/Role';
-import { NotEditableItem } from '../exceptions/NotEditableItem';
-import { GroupRoleRepository } from '../repositories/GroupRoleRepository';
-import { RoleRepository } from '../repositories/RoleRepository';
-import { TransactionRepository } from '../repositories/TransactionRepository';
-import { SystemConstants } from '../systemConfig/SystemConstants';
+import { Role } from "../entities/Role";
+import { NotEditableItem } from "../exceptions/NotEditableItem";
+import { GroupRoleRepository } from "../repositories/GroupRoleRepository";
+import { RoleRepository } from "../repositories/RoleRepository";
+import { TransactionRepository } from "../repositories/TransactionRepository";
+import { SystemConstants } from "../systemConfig/SystemConstants";
 
 export class RoleService {
   repository: RoleRepository;
@@ -11,7 +11,7 @@ export class RoleService {
 
   constructor(
     repository: RoleRepository,
-    groupRoleRepository: GroupRoleRepository
+    groupRoleRepository: GroupRoleRepository,
   ) {
     this.repository = repository;
     this.groupRoleRepository = groupRoleRepository;
