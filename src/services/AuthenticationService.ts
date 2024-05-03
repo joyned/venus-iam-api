@@ -18,6 +18,8 @@ export class AuthenticationService {
         throw new InvalidPasswordError(`Invalid password for user ${email}.`);
       }
 
+      //TODO: check if user has SYSTEM_ADMIN or SYSTEM_VIEWR role
+
       const roles = await this.findRolesByUserId(user.id);
 
       const token = Jwt.sign(
