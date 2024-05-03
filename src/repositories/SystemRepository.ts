@@ -2,13 +2,13 @@ import { System } from "../entities/System";
 import { executeQuery } from "./BaseRepository";
 
 export class SystemRepository {
-    static async findById(id: number) {
+    async findById(id: number) {
         const result = await executeQuery("SELECT ID, VERSION FROM VENUS.SYSTEM WHERE ID = $1", [id]);
         
         return result.rows[0]
     }
 
-    static async persist(system: System) {
+    async persist(system: System) {
         const result = await executeQuery(`INSERT INTO venus."system" (id, "version") VALUES($1, $2);`, [system.id, system.version]);
         return result.rows[0]
     }

@@ -1,46 +1,55 @@
-import { v4 } from "uuid";
-import { User } from "../entities/User";
-import { UserRepository } from "../repositories/UserRepository";
-import { UserGroupRepository } from "../repositories/UserRoleRepository";
-import { Group } from "../entities/Group";
-import { GroupRepository } from "../repositories/GroupRepository";
-import { TransactionRepository } from "../repositories/TransactionRepository";
+import { v4 } from 'uuid';
+import { User } from '../entities/User';
+import { UserRepository } from '../repositories/UserRepository';
+import { UserGroupRepository } from '../repositories/UserRoleRepository';
+import { Group } from '../entities/Group';
+import { GroupRepository } from '../repositories/GroupRepository';
+import { TransactionRepository } from '../repositories/TransactionRepository';
 
 export class UserService {
+  userRepository: UserRepository;
+  userGroupRepository: UserGroupRepository;
 
-    async findAll(): Promise<User[]> {
-        return await UserRepository.findAll();
+  constructor(
+    userRepository: UserRepository,
+    userGroupRepository: UserGroupRepository
+  ) {
+    this.userRepository = userRepository;
+    this.userGroupRepository = userGroupRepository;
+  }
+
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.findAll();
+  }
+
+  async findById(id: string): Promise<User> {
+    const user: User = await this.userRepository.findById(id);
+    const groups: Group[] = await GroupRepository.findGroupsByUserId(id);
+    user.groups = [];
+    groups.forEach((group) => user.groups.push(group));
+    return user;
+  }
+
+  async persist(user: User): Promise<User | undefined> {
+    this.userGroupRepository.destroy(user.id);
+    const persistedUser = await this.userRepository.persist(user);
+    if (persistedUser) {
+      this.userGroupRepository.persist(persistedUser.id, persistedUser.groups);
+      return persistedUser;
     }
+    return undefined;
+  }
 
-    async findById(id: string): Promise<User> {
-        const user: User = await UserRepository.findById(id);
-        const groups: Group[] = await GroupRepository.findGroupsByUserId(id);
-        user.groups = []
-        groups.forEach(group => user.groups.push(group));
-        return user;
-    }
+  async delete(id: string): Promise<string | undefined> {
+    return await TransactionRepository.run(async () => {
+      this.userGroupRepository.destroy(id);
+      const result = await this.userRepository.destroy(id);
 
-    async persist(user: User): Promise<User | undefined> {
-        await UserGroupRepository.destroy(user.id);
-        const persistedUser = await UserRepository.persist(user);
-        if (persistedUser) {
-            await UserGroupRepository.persist(persistedUser.id, persistedUser.groups);
-            return persistedUser;
-        }
-        return undefined;
-    }
+      if (result) {
+        return id;
+      }
 
-
-    async delete(id: string): Promise<string | undefined> {
-        return await TransactionRepository.run(async () => {
-            await UserGroupRepository.destroy(id);
-            const result = await UserRepository.destroy(id);
-
-            if (result) {
-                return id;
-            }
-
-            return undefined;
-        });
-    }
+      return undefined;
+    });
+  }
 }

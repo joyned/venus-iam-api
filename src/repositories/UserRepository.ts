@@ -10,24 +10,24 @@ const UPDATE =
 const DELETE = `DELETE FROM venus."user" WHERE id=$1`;
 
 export class UserRepository {
-  static async findAll() {
+  async findAll() {
     const result = await executeQuery(FIND);
 
     return result.rows;
   }
 
-  static async findById(id: string) {
+  async findById(id: string) {
     const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
     return result.rows[0];
   }
 
-  static async findByEmail(email: string) {
+  async findByEmail(email: string) {
     const result = await executeQuery(`${FIND} WHERE email = $1`, [email]);
     return result.rows[0];
   }
 
-  static async persist(user: User) {
+  async persist(user: User) {
     let result = undefined;
 
     if (!user.id) {
@@ -55,7 +55,7 @@ export class UserRepository {
     return undefined;
   }
 
-  static async destroy(id: string) {
+  async destroy(id: string) {
     const result = await executeQuery(DELETE, [id]);
 
     if (result.rowCount == 1) {

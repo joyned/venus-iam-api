@@ -8,20 +8,20 @@ const UPDATE = 'UPDATE venus.client SET "name"=$2, url=$3, image=$4 WHERE id=$1'
 const DELETE = `DELETE FROM venus."client" WHERE id=$1`
 
 export class ClientRepository {
-    static async findAll() {
+    async findAll() {
         let clients: Client[] = []
         const result = await executeQuery(FIND);
 
         return result.rows;
     }
 
-    static async findById(id: string) {
+    async findById(id: string) {
         const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
         return result.rows[0];
     }
 
-    static async persist(client: Client) {
+    async persist(client: Client) {
         let result = undefined;
 
         if (!client.id) {
@@ -39,7 +39,7 @@ export class ClientRepository {
         return undefined;
     }
 
-    static async destroy(id: string) {
+    async destroy(id: string) {
         const result = await executeQuery(DELETE, [id]);
         if (result.rowCount == 1) {
             return id;

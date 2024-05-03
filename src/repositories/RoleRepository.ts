@@ -11,29 +11,29 @@ const UPDATE = 'UPDATE venus."role" SET "name"=$2 WHERE id=$1';
 const DELETE = `DELETE FROM venus."role" WHERE id=$1`;
 
 export class RoleRepository {
-  static async findAll() {
+  async findAll() {
     const result = await executeQuery(FIND);
 
     return result.rows;
   }
 
-  static async findById(id: string) {
+  async findById(id: string) {
     const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
     return result.rows[0];
   }
 
-  static async findRolesByGroupId(groupId: string) {
+  async findRolesByGroupId(groupId: string) {
     const result = await executeQuery(FIND_ROLE_BY_GROUP_ID, [groupId]);
     return result.rows;
   }
 
-  static async findRolesByUserId(userId: string) {
+  async findRolesByUserId(userId: string) {
     const result = await executeQuery(FIND_ROLES_BY_USER_ID, [userId]);
     return result.rows;
   }
 
-  static async persist(role: Role): Promise<Role | undefined> {
+  async persist(role: Role): Promise<Role | undefined> {
     let result = undefined;
     if (!role.id) {
       role.id = v4();
@@ -50,7 +50,7 @@ export class RoleRepository {
     return undefined;
   }
 
-  static async destroy(id: string) {
+  async destroy(id: string) {
     const result = await executeQuery(DELETE, [id]);
     if (result.rowCount == 1) {
       return id;

@@ -6,23 +6,23 @@ const INSERT = `INSERT INTO venus.group_role (group_id, role_id) VALUES($1, $2)`
 const DELETE = `DELETE FROM venus.group_role WHERE group_id=$1`
 
 export class GroupRoleRepository {
-    static async findAll() {
+    async findAll() {
         const result = await executeQuery(FIND);
         return result.rows;
     }
 
-    static async findByGroupId(id: string) {
+    async findByGroupId(id: string) {
         const result = await executeQuery(`${FIND} WHERE group_id = $1`, [id]);
         return result.rows;
     }
 
-    static async persist(groupId: string, roles: Role[]) {
+    async persist(groupId: string, roles: Role[]) {
         roles.forEach(async role => {
             await executeQuery(INSERT, [groupId, role.id]);
         });
     }
 
-    static async destroy(groupId: string) {
+    async destroy(groupId: string) {
         const result = await executeQuery(DELETE, [groupId]);
         if (result.rowCount == 1) {
             return groupId;

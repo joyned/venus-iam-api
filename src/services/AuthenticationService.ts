@@ -7,11 +7,19 @@ import { UserRepository } from '../repositories/UserRepository';
 import Jwt from 'jsonwebtoken';
 
 export class AuthenticationService {
+  userRepository: UserRepository;
+  roleRepository: RoleRepository;
+
+  constructor(userRepository: UserRepository, roleRepository: RoleRepository) {
+    this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
+  }
+
   async login(
     email: string,
     password: string
   ): Promise<AuthenticationDTO | undefined> {
-    const user = await UserRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email);
 
     if (user) {
       if (user.password !== password) {
@@ -43,7 +51,7 @@ export class AuthenticationService {
   }
 
   async findRolesByUserId(userId: string): Promise<string[]> {
-    const roles: Role[] = await RoleRepository.findRolesByUserId(userId);
+    const roles: Role[] = await this.roleRepository.findRolesByUserId(userId);
     return roles.map((role) => role.name);
   }
 

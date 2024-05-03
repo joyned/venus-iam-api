@@ -9,24 +9,24 @@ const UPDATE = 'UPDATE venus."group" SET "name"=$2, last_update=CURRENT_TIMESTAM
 const DELETE = `DELETE FROM venus."group" WHERE id=$1`
 
 export class GroupRepository {
-    static async findAll() {
+    async findAll() {
         const result = await executeQuery(FIND);
 
         return result.rows;
     }
 
-    static async findById(id: string) {
+    async findById(id: string) {
         const result = await executeQuery(`${FIND} WHERE id = $1`, [id]);
 
         return result.rows[0]
     }
 
-    static async findGroupsByUserId(userId: string) {
+    async findGroupsByUserId(userId: string) {
         const result = await executeQuery(FIND_GROUPS_BY_USER, [userId]);
         return result.rows;
     }
 
-    static async persist(group: Group) {
+    async persist(group: Group) {
         let result = undefined;
 
         if (!group.id) {
@@ -43,7 +43,7 @@ export class GroupRepository {
         return undefined;
     }
 
-    static async destroy(id: string) {
+    async destroy(id: string) {
         const result = await executeQuery(DELETE, [id]);
         if (result.rowCount == 1) {
             return id;

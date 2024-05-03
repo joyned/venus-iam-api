@@ -6,12 +6,12 @@ const INSERT = `INSERT INTO venus.auth_settings(token_durability, generate_refre
 const UPDATE = `UPDATE venus.auth_settings SET token_durability=$1, generate_refresh_token=$2`
 
 export class AuthSettingsRepository {
-    static async find() {
+     async find() {
         const result = await executeQuery(FIND);
         return result.rows[0];
     }
 
-    static async update(authSettings: AuthSettings) {
+     async update(authSettings: AuthSettings) {
         const result = await executeQuery(UPDATE, [authSettings.tokenDurability, authSettings.generateRefreshToken]);
         if (result.rowCount == 1) {
             return authSettings;
@@ -20,7 +20,7 @@ export class AuthSettingsRepository {
         return undefined;
     }
 
-    static async save(authSettings: AuthSettings) {
+     async save(authSettings: AuthSettings) {
         const result = await executeQuery(INSERT, [authSettings.tokenDurability, authSettings.generateRefreshToken, authSettings.jwtSecret]);
         if (result.rowCount == 1) {
             return authSettings;
