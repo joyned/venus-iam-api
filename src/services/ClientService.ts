@@ -4,6 +4,9 @@ import { ClientAllowedUrl } from "../entities/ClientAllowedUrl";
 import { ClientAllowedUrlRepository } from "../repositories/ClientAllowedUrlRepository";
 import { ClientRepository } from "../repositories/ClientRepository";
 import { TransactionRepository } from "../repositories/TransactionRepository";
+import { InvalidClientSecretError } from "../exceptions/InvalidClientSecretError";
+import { InvalidClientIdError } from "../exceptions/InvalidClientIdError";
+import { InvalidRedirectUrlError } from "../exceptions/InvalidRedirectUrlError";
 
 export class ClientService {
 
@@ -42,5 +45,26 @@ export class ClientService {
             }
             return undefined;
         });
+    }
+
+    async checkCredentials(clientId: string, clientSecret: string, redirectUrl: string): Promise<boolean> {
+        const clientAllowedUrls = await ClientAllowedUrlRepository.findByClientId(clientId);
+        const client = new Client(await ClientRepository.findById(clientId));
+
+        const urls = clientAllowedUrls.map((au) => au.url);
+
+        if(!client) {
+            throw new InvalidClientIdError(`Client ${clientId} not found`);
+        }
+        
+        if (client.clientSecret !== clientSecret) {
+            throw new InvalidClientSecretError(`Invalid client secret for client ${clientId}`);
+        }
+
+        if(!urls.includes(redirectUrl)) {
+            throw new InvalidRedirectUrlError(`Redirect URL ${redirectUrl} is not allowed for client ${clientId}`);
+        }
+
+        return true;
     }
 }
