@@ -26,18 +26,8 @@ export class GroupService {
     }
 
     async persist(group: Group): Promise<string | undefined> {
-        let isCreate = false;
         if (this.canNotEditGroup(group)) {
             throw new NotEditableItem(`Unable to modify group ${group.name}`);
-        }
-
-        if (!group.id) {
-            group.id = v4();
-            isCreate = true;
-        }
-
-        if (!group.createdAt) {
-            group.createdAt = new Date();
         }
 
         group.lastUpdate = new Date();
