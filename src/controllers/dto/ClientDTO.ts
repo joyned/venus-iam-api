@@ -4,6 +4,7 @@ export interface ClientDTO {
     url: string;
     clientId: string;
     clientSecret: string;
+    image: string;
     allowedUrls: string[];
     createdAt: Date;
 }

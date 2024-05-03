@@ -4,8 +4,8 @@ import { ClientAllowedUrl } from '../../entities/ClientAllowedUrl';
 import { Group } from '../../entities/Group';
 import { Role } from '../../entities/Role';
 import { User } from '../../entities/User';
-import { AuthenticationDTO } from '../dto/AuthenticationDTO';
 import { AuthSettingsDTO } from '../dto/AuthSettingsDTO';
+import { AuthenticationDTO } from '../dto/AuthenticationDTO';
 import { ClientAllowedUrlDTO } from '../dto/ClientAllowedUrlDTO';
 import { ClientDTO } from '../dto/ClientDTO';
 import { GroupDTO } from '../dto/GroupDTO';
@@ -33,6 +33,7 @@ export function mapClientToDTO(client: Client): ClientDTO {
         url: client.url,
         clientId: client.id,
         clientSecret: client.clientSecret,
+        image: client.image,
         allowedUrls: client.allowedUrls?.map(url => url),
         createdAt: client.createdAt
     };
