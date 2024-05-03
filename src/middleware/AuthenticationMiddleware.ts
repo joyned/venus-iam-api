@@ -1,11 +1,16 @@
 import { loggerFactory } from '../logger';
+import { RoleRepository } from '../repositories/RoleRepository';
+import { UserRepository } from '../repositories/UserRepository';
 import { AuthenticationService } from '../services/AuthenticationService';
 
 const logger = loggerFactory(__filename);
 
 export function authenticationMiddleware(roles: string[] = []) {
   return (req: any, res: any, next: any) => {
-    const authService = new AuthenticationService();
+    const authService = new AuthenticationService(
+      new UserRepository(),
+      new RoleRepository()
+    );
     const token = req.headers.authorization;
 
     if (!token) {

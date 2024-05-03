@@ -25,6 +25,19 @@ export class UserService {
     return await this.userRepository.findAll();
   }
 
+  async findByEmail(email: string): Promise<User | undefined> {
+    const user: User = await this.userRepository.findByEmail(email);
+    if (user) {
+      const groups: Group[] = await this.groupRepository.findGroupsByUserId(
+        user.id
+      );
+      user.groups = [];
+      groups.forEach((group) => user.groups.push(group));
+      return user;
+    }
+    return undefined;
+  }
+
   async findById(id: string): Promise<User> {
     const user: User = await this.userRepository.findById(id);
     const groups: Group[] = await this.groupRepository.findGroupsByUserId(id);

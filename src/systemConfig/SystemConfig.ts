@@ -1,5 +1,3 @@
-import { AuthSettings } from '../entities/AuthSettings';
-import { Role } from '../entities/Role';
 import { loggerFactory } from '../logger';
 import {
   beginTransaction,
@@ -13,14 +11,24 @@ import { generatePassword } from '../utils/Utils';
 import { SystemConstants } from './SystemConstants';
 
 import { version } from '../../package.json';
+import { UserRepository } from '../repositories/UserRepository';
+import { UserGroupRepository } from '../repositories/UserRoleRepository';
 import { UserService } from '../services/UserService';
 
 export class SystemConfig {
   private readonly logger = loggerFactory(__filename);
   private readonly systemVersion: string = version;
 
+  systemRepository: SystemRepository;
+  groupRepository: GroupRepository;
+
+  constructor() {
+    this.systemRepository = new SystemRepository();
+    this.groupRepository = new GroupRepository();
+  }
+
   async getSystemInfo() {
-    return SystemRepository.findById(1);
+    return this.systemRepository.findById(1);
   }
 
   //TODO: melhorar essa classe
@@ -52,22 +60,30 @@ export class SystemConfig {
 
   async createDefaultUsers() {
     try {
-      const userService = new UserService();
+      const userService = new UserService(
+        new UserRepository(),
+        new UserGroupRepository(),
+        new GroupRepository()
+      );
       const adminUser: any = {
         name: 'Admin',
         email: process.env.ADMIN_USER_EMAIL || 'admin@venus.com',
         password: process.env.ADMIN_USER_PASSWORD || '123mudar',
-        groups: await GroupRepository.findAll(),
+        groups: await this.groupRepository.findAll(),
       };
 
-      await userService.persist(adminUser);
+      const user = await userService.findByEmail(adminUser.email);
+
+      if (!user) {
+        await userService.persist(adminUser);
+      }
     } catch (error) {
       this.logger.error(`Error occured while creating default users. ${error}`);
     }
   }
 
   private async alreadyConfigured(): Promise<boolean> {
-    const system = await SystemRepository.findById(1);
+    const system = await this.systemRepository.findById(1);
     if (system) {
       this.logger.info(`System configured. Version ${system.version}`);
       return true;
