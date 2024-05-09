@@ -53,6 +53,7 @@ export function mapClientToDTO(client: Client): ClientDTO {
     clientSecret: client.clientSecret,
     image: client.image,
     allowedUrls: client.allowedUrls?.map((url) => url),
+    allowedGroups: client.allowedGroups?.map(mapGroupToDTO),
     createdAt: client.createdAt,
   };
 }

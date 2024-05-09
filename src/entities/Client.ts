@@ -1,3 +1,5 @@
+import { Group } from "./Group";
+
 export class Client {
   declare id: string;
   declare name: string;
@@ -5,6 +7,7 @@ export class Client {
   declare clientSecret: string;
   declare image: string;
   declare allowedUrls: any[];
+  declare allowedGroups: Group[];
   declare createdAt: Date;
 
   constructor(data?: any) {
@@ -15,6 +18,7 @@ export class Client {
       this.clientSecret = data.client_secret;
       this.image = data.image;
       this.allowedUrls = data.allowed_urls;
+      this.allowedGroups = data.allowed_groups;
       this.createdAt = new Date(data.created_at);
     }
   }

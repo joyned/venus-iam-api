@@ -1,9 +1,10 @@
+import { PoolClient, QueryResult } from "pg";
 import { pool } from "../database";
 import { loggerFactory } from "../logger";
 
 const logger = loggerFactory("BaseRepository");
 
-const executeQuery = async (query: string, params: any[] = []) => {
+const executeQuery = async (query: string, params: any[] = []): Promise<QueryResult<any>> => {
   try {
     logger.info(`Executing query: ${query} with params: ${params}`);
     return await pool.query(query, params);
@@ -13,19 +14,20 @@ const executeQuery = async (query: string, params: any[] = []) => {
   }
 };
 
-const beginTransaction = async () => {
-  logger.info(`Begining transaction...`);
-  return await pool.query("BEGIN");
-};
+const executeTransaction = async (callback: (transaction: PoolClient) => Promise<any>) => {
+  const transaction = await pool.connect();
+  try {
+    await transaction.query('BEGIN')
+    try {
+      await callback(transaction)
+      await transaction.query('COMMIT')
+    } catch (e) {
+      await transaction.query('ROLLBACK')
+    }
+  } finally {
+    transaction.release()
+  }
+}
 
-const rollbackTransation = async () => {
-  logger.info(`Rollbacking transaction...`);
-  return await pool.query("ROLLBACK");
-};
+export { executeQuery, executeTransaction };
 
-const commitTransation = async () => {
-  logger.info(`Commiting transaction...`);
-  return await pool.query("COMMIT");
-};
-
-export { executeQuery, beginTransaction, rollbackTransation, commitTransation };

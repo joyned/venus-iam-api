@@ -1,3 +1,5 @@
+import { GroupDTO } from "./GroupDTO";
+
 export interface ClientDTO {
   id: string;
   name: string;
@@ -6,5 +8,6 @@ export interface ClientDTO {
   clientSecret: string;
   image: string;
   allowedUrls: string[];
+  allowedGroups: GroupDTO[];
   createdAt: Date;
 }

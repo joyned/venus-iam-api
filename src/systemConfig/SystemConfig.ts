@@ -1,9 +1,6 @@
 import { loggerFactory } from "../logger";
 import {
-  beginTransaction,
-  commitTransation,
   executeQuery,
-  rollbackTransation,
 } from "../repositories/BaseRepository";
 import { GroupRepository } from "../repositories/GroupRepository";
 import { SystemRepository } from "../repositories/SystemRepository";
@@ -36,7 +33,6 @@ export class SystemConfig {
   async start() {
     try {
       if (!(await this.alreadyConfigured())) {
-        await beginTransaction();
         this.logger.info(`Configuring System. Please wait...`);
 
         await this.initializeDatabase(
@@ -50,10 +46,8 @@ export class SystemConfig {
         );
 
         this.logger.info(`System configured. Version ${this.systemVersion}`);
-        await commitTransation();
       }
     } catch (error) {
-      await rollbackTransation();
       this.logger.error(`Error occured while starting server. ${error}`);
     }
   }

@@ -7,11 +7,15 @@ import { InvalidClientSecretError } from "../exceptions/InvalidClientSecretError
 import { InvalidRedirectUrlError } from "../exceptions/InvalidRedirectUrlError";
 import { ClientRepository } from "../repositories/ClientRepository";
 import { ClientAllowedUrlRepository } from "../repositories/ClientAllowedUrlRepository";
+import ClientGroupRepository from "../repositories/ClientGroupRepository";
+import { GroupRepository } from "../repositories/GroupRepository";
 
 const clientController = Router();
 const service = new ClientService(
   new ClientRepository(),
   new ClientAllowedUrlRepository(),
+  new ClientGroupRepository(),
+  new GroupRepository(),
 );
 
 clientController.get(

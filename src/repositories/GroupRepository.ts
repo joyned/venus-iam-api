@@ -8,6 +8,7 @@ const INSERT = `INSERT INTO venus."group" (id, "name", created_at, last_update) 
 const UPDATE =
   'UPDATE venus."group" SET "name"=$2, last_update=CURRENT_TIMESTAMP WHERE id=$1;';
 const DELETE = `DELETE FROM venus."group" WHERE id=$1`;
+const FIND_GROUPS_BY_CLIENT = `SELECT g.* FROM venus."group" g JOIN venus.client_group cg ON cg.group_id = g.id AND cg.client_id = $1`;
 
 export class GroupRepository {
   async findAll() {
@@ -24,6 +25,11 @@ export class GroupRepository {
 
   async findGroupsByUserId(userId: string) {
     const result = await executeQuery(FIND_GROUPS_BY_USER, [userId]);
+    return result.rows;
+  }
+
+  async findGroupsByClientId(clientId: string) {
+    const result = await executeQuery(FIND_GROUPS_BY_CLIENT, [clientId]);
     return result.rows;
   }
 
