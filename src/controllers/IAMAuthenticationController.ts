@@ -21,7 +21,11 @@ const iamLoginService = new IAMLoginService(
 );
 
 iamAuthenticationController.post('/', async (req, res) => {
-  return res.json(await service.doLogin(req.body.email, req.body.password));
+  try {
+    return res.json(await service.doLogin(req.body.email, req.body.password));
+  } catch (error: any) {
+    return res.status(401).json({ message: error.message });
+  }
 });
 
 iamAuthenticationController.get('/loginPageSettings/:id', async (req, res) => {
