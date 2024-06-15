@@ -7,6 +7,7 @@ import { IAMLoginService } from '../services/IAMLoginService';
 import { ClientRepository } from '../repositories/ClientRepository';
 import { TenantSettingsRepository } from '../repositories/TenantSettingsRepository';
 import { mapTenantSettingsToDTO } from './mapper';
+import { ClientNotFoundError } from '../exceptions/ClientNotFoundError';
 
 const iamAuthenticationController = Router();
 const service = new IAMAuthenticationService(
@@ -30,9 +31,17 @@ iamAuthenticationController.post('/', async (req, res) => {
 
 iamAuthenticationController.get('/loginPageSettings/:id', async (req, res) => {
   const clientId = req.params.id as string;
-  return res.json(
-    mapTenantSettingsToDTO(await iamLoginService.getLoginPageSettings(clientId))
-  );
+  try {
+    return res.json(
+      mapTenantSettingsToDTO(await iamLoginService.getLoginPageSettings(clientId))
+    );
+  } catch (error: any) {
+    if (error instanceof ClientNotFoundError) {
+      return res.status(404).json({ message: error.message });
+    }
+
+    return res.status(500).json({ message: error.message });
+  }
 });
 
 export default iamAuthenticationController;
